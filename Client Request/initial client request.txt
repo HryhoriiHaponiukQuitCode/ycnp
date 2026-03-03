@@ -1,0 +1,41 @@
+Hi Roman, 
+This is Yaacov Cohen from TA. I am emailing you from my side-business consulting company email address.
+
+I would like to hire you personally to build some sellable products for my consulting business.   Some of these projects relate to your work at TA, as my consulting business teaches fundraising to other organizations.
+
+In my business (ycnpconsulting.com), I focus on two things:
+1. I consult and coach other organizations on fundraising campaigns and best practices, training them to set up and run their fundraising department.
+2. I have a course called the Major Donor Bootcamp that teaches a specific fundraising method.
+
+When working with clients, or after the Bootcamp, often my clients want an actual template for implementing what I teach. I have set up an Airtable base very similar to the fundraising one that we use at TA. It is fairly simple, but between the database and the interface, it gives them a clean(ish) UI to implement everything I teach in my courses.  The Airtable base is designed to hold information about their major donors and allow them to schedule tasks (called "Moves") With those donors to build the relationship. The base also includes a library of over 70 suggested moves that staff can choose from when building their task list for the year.  This database is not necessarily designed to replace their CRM. It is only designed to take certain prospects that they need to manage the relationship with and use Airtable to do that relationship management since often whatever CRM they might use (Like Bloomerang) may not have that functionality, or it might not be as robust.  
+
+If clients want to take advantage of this product, I sell them the template along with the setup and training on how to use it.   I give clients an Excel template to fill out with the information. Then, I use that information to populate Airtable for the setup.  I don't know if there is an easier way to do this.
+
+I want to design additional features, including one you've already started on our TA Moves Management database, but I need to build them to be highly scalable.  Please see the attached PDF's, one from Claude and the other from Gemini.  I used their deep research tools to suggest how the first three tools in the list below could be built and which tools could be used.  Claude's response was more straightforward, but Gemini added some helpful information, I think.  Below is what I want to build.
+
+Airtable Improved Functionality
+
+High Priority
+1. A button to push that takes all donor information from the donor record and conducts significant research to enrich it.  You already started working on this in the TA's database, but we never completed it.  I have many comments on how we can improve it; I even built an agent myself on Zapier to do this.  It triggers when new donations come into Bloomerang and sends a comprehensive email with donor information.  See the forwarded email attachment to see an example.  It does a really incredible research that checks all of my boxes.  You can look at the app I created in Zapier, or I can explain some of the tools I used to build it, but I would love to be able to trigger something like this on demand,  and provide it to my clients.
+2. A button to help a client prepare for a donor meeting using the research from Step 2 and all available database information.
+3. A button that helps a client plan future moves for the donor and possibly even automatically add the moves as a subsequent step.
+4. An AI email and communication drafter based on the donor and communication purpose, using information about that donor.
+
+Medium Priority
+1. An after meeting debrief and notes capture where a fund raiser types or dictates rough notes and AI structures those notes into key outcomes and follow-ups.  If this could be done through WhatsApp voice notes, it would be a home run.
+2. A cleaner UI than the interface that sits on top of the Airtable base to make the whole experience more user-friendly for the client.
+
+Stand-Alone App
+
+I want to build these features in a way that they could be deployed in a standalone app as well, which could be sold. It would allow people to upload names and addresses of donors, etc. And it can do pretty much all of these things, even without the full database option.  Or perhaps they could type in someone's name, address, email, or phone number, and it would go out and do all the same things.
+
+Please look this over and let me know when we can meet to discuss.
+
+----------------------
+
+
+Zoom for 20 people
+
+Everyone like it, but CRM for people does not support it.
+
+Initially worked in boomerang

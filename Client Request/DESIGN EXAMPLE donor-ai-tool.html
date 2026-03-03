@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DonorMind — AI Relationship Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a24;
+    --paper: #f5f3ee;
+    --muted: #8b8880;
+    --accent: #c8622a;
+    --accent-light: #f0d9cc;
+    --green: #2d6a4f;
+    --green-light: #d8f3dc;
+    --border: #e0ddd7;
+    --white: #ffffff;
+    --card: #fefcfa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px;
+    background: var(--ink);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 0;
+    flex-shrink: 0;
+    position: fixed;
+    height: 100vh;
+    top: 0; left: 0;
+  }
+
+  .logo {
+    padding: 0 24px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .logo-mark {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
+
+  .logo-mark span { color: var(--accent); }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .nav {
+    padding: 20px 0;
+    flex: 1;
+  }
+
+  .nav-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    padding: 0 24px 8px;
+    margin-top: 16px;
+  }
+
+  .nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 400;
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+  }
+
+  .nav a:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.04); }
+  .nav a.active { color: var(--white); border-left-color: var(--accent); background: rgba(200,98,42,0.1); }
+
+  .nav a .icon { font-size: 15px; opacity: 0.7; }
+
+  .sidebar-footer {
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: white;
+    flex-shrink: 0;
+  }
+
+  .user-name { font-size: 12px; color: rgba(255,255,255,0.7); }
+  .user-org { font-size: 10px; color: rgba(255,255,255,0.3); }
+
+  /* MAIN */
+  .main {
+    margin-left: 220px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 10;
+  }
+
+  .breadcrumb {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .breadcrumb strong { color: var(--ink); font-weight: 500; }
+
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink);
+  }
+
+  .btn-ghost:hover { background: var(--paper); }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .btn-primary:hover { background: #2d2d3a; }
+
+  /* CONTENT */
+  .content {
+    padding: 36px;
+    flex: 1;
+  }
+
+  /* DONOR HEADER */
+  .donor-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .donor-avatar-lg {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c8622a, #e8956a);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .donor-meta h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.5px;
+    color: var(--ink);
+  }
+
+  .donor-meta .subtitle {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .donor-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+
+  .tag-major { background: var(--accent-light); color: var(--accent); }
+  .tag-warm { background: var(--green-light); color: var(--green); }
+  .tag-default { background: var(--border); color: var(--muted); }
+
+  .donor-header-right {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .giving-stat {
+    text-align: right;
+  }
+
+  .giving-stat .amount {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--ink);
+    letter-spacing: -1px;
+  }
+
+  .giving-stat .label { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+
+  /* AI ACTION STRIP */
+  .ai-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .ai-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px rgba(200,98,42,0.1);
+    transform: translateY(-1px);
+  }
+
+  .ai-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+  }
+
+  .ai-card:hover::before { transform: scaleX(1); }
+
+  .ai-card-icon {
+    font-size: 22px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .ai-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .ai-card p {
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .ai-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: var(--ink);
+    color: var(--white);
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  /* TWO COLUMNS */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+  }
+
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+
+  /* TIMELINE */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+
+  .timeline-item {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .timeline-item:last-child { border-bottom: none; }
+
+  .tl-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    margin-top: 5px;
+    position: relative;
+  }
+
+  .tl-dot.meeting { background: var(--accent); }
+  .tl-dot.gift { background: var(--green); }
+  .tl-dot.email { background: #6c7ae0; }
+
+  .tl-date { font-size: 11px; color: var(--muted); width: 70px; flex-shrink: 0; padding-top: 2px; }
+
+  .tl-body h4 { font-size: 13.5px; font-weight: 500; color: var(--ink); }
+  .tl-body p { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+
+  .gift-amount {
+    margin-left: auto;
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: var(--green);
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  /* MOVES */
+  .move-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .move-item:last-child { border-bottom: none; }
+
+  .move-check {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .move-check:hover { border-color: var(--accent); }
+  .move-check.done { background: var(--green); border-color: var(--green); color: white; font-size: 10px; }
+
+  .move-body h4 { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .move-body p { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+  .move-due {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--muted);
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .move-due.soon { color: var(--accent); }
+
+  /* RESEARCH PANEL */
+  .research-panel {
+    background: var(--ink);
+    border-radius: 10px;
+    padding: 22px;
+    color: white;
+    margin-bottom: 16px;
+  }
+
+  .research-panel .section-title { color: rgba(255,255,255,0.35); }
+
+  .research-item {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .research-item:last-child { border-bottom: none; }
+
+  .research-item h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 5px;
+  }
+
+  .research-item p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.55;
+  }
+
+  .research-item p strong { color: var(--accent); font-weight: 500; }
+
+  /* QUICK STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .stat-mini {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .stat-mini .val {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+  }
+
+  .stat-mini .lbl {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-top: 2px;
+  }
+
+  /* AI RESPONSE PANEL */
+  .ai-response {
+    background: linear-gradient(135deg, #1a1a24, #2a2035);
+    border-radius: 10px;
+    padding: 22px;
+    color: white;
+    display: none;
+    margin-bottom: 16px;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .ai-response.visible { display: block; }
+
+  .ai-response-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .ai-spinner {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .ai-response-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .ai-response-body {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .ai-response-body .highlight {
+    background: rgba(200,98,42,0.2);
+    color: #f0a070;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  .ai-response-body ul {
+    list-style: none;
+    margin-top: 10px;
+  }
+
+  .ai-response-body ul li {
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .ai-response-body ul li::before {
+    content: '→';
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 0px;
+  }
+
+  /* LOADING STATE */
+  .loading-dots {
+    display: inline-flex;
+    gap: 4px;
+  }
+
+  .loading-dots span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: bounce 1.2s infinite;
+  }
+
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+  .email-preview {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+
+  .email-preview-header {
+    padding: 12px 16px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .email-preview-body {
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">Donor<span>Mind</span></div>
+    <div class="logo-sub">AI Relationship Intelligence</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-label">Workspace</div>
+    <a href="#">
+      <span class="icon">⊞</span> Dashboard
+    </a>
+    <a href="#" class="active">
+      <span class="icon">◉</span> Donors
+    </a>
+    <a href="#">
+      <span class="icon">◈</span> Meetings
+    </a>
+    <a href="#">
+      <span class="icon">◇</span> Moves
+    </a>
+    <div class="nav-label">Tools</div>
+    <a href="#">
+      <span class="icon">✦</span> AI Research
+    </a>
+    <a href="#">
+      <span class="icon">✉</span> Communications
+    </a>
+    <a href="#">
+      <span class="icon">≡</span> Reports
+    </a>
+    <div class="nav-label">Settings</div>
+    <a href="#">
+      <span class="icon">⚙</span> Preferences
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar">SB</div>
+      <div>
+        <div class="user-name">Sarah Bondar</div>
+        <div class="user-org">YCNP Consulting</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb">Donors / <strong>Jonathan Kessler</strong></div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost">← Back to list</button>
+      <button class="btn btn-ghost">Edit Profile</button>
+      <button class="btn btn-primary">+ Add Interaction</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DONOR HEADER -->
+    <div class="donor-header">
+      <div class="donor-avatar-lg">JK</div>
+      <div class="donor-meta">
+        <h1>Jonathan Kessler</h1>
+        <div class="subtitle">Managing Partner, Meridian Capital Group · New York, NY</div>
+        <div class="donor-tags">
+          <span class="tag tag-major">Major Donor</span>
+          <span class="tag tag-warm">Warm Relationship</span>
+          <span class="tag tag-default">Education Focus</span>
+          <span class="tag tag-default">Assigned: Sarah B.</span>
+        </div>
+      </div>
+      <div class="donor-header-right">
+        <div class="giving-stat">
+          <div class="amount">$142,500</div>
+          <div class="label">Total Given</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI ACTION STRIP -->
+    <div class="ai-strip">
+      <div class="ai-card" onclick="triggerAI('research')">
+        <span class="ai-badge">AI</span>
+        <span class="ai-card-icon">🔍</span>
+        <h3>Donor Research</h3>
+        <p>Deep intelligence report on Jonathan's background, interests & giving history</p>
+      </div>
+      <div class="ai-card" onclick="triggerAI('prep')">
+        <span class="ai-badge">AI</span>
+        <span class="ai-card-icon">📋</span>
+        <h3>Meeting Prep</h3>
+        <p>One-page briefing with talking points, sensitivities & recommended ask</p>
+      </div>
+      <div class="ai-card" onclick="triggerAI('moves')">
+        <span class="ai-badge">AI</span>
+        <span class="ai-card-icon">🗺</span>
+        <h3>Plan Next Moves</h3>
+        <p>AI-suggested next steps to deepen relationship & advance cultivation</p>
+      </div>
+      <div class="ai-card" onclick="triggerAI('email')">
+        <span class="ai-badge">AI</span>
+        <span class="ai-card-icon">✉</span>
+        <h3>Draft Email</h3>
+        <p>Personalized communication based on donor history and relationship</p>
+      </div>
+    </div>
+
+    <!-- AI RESPONSE PANEL -->
+    <div class="ai-response" id="aiResponse">
+      <div class="ai-response-header">
+        <div class="ai-spinner" id="aiSpinner"></div>
+        <div class="ai-response-label" id="aiLabel">AI Research Report</div>
+      </div>
+      <div class="ai-response-body" id="aiBody"></div>
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="stats-row">
+      <div class="stat-mini">
+        <div class="val">8</div>
+        <div class="lbl">Meetings</div>
+      </div>
+      <div class="stat-mini">
+        <div class="val">$50K</div>
+        <div class="lbl">Largest Gift</div>
+      </div>
+      <div class="stat-mini">
+        <div class="val">4.2y</div>
+        <div class="lbl">Relationship</div>
+      </div>
+    </div>
+
+    <!-- TWO COLUMNS -->
+    <div class="two-col">
+
+      <!-- LEFT: TIMELINE + MOVES -->
+      <div>
+        <div class="card">
+          <div class="section-title">Interaction History</div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="tl-dot meeting"></div>
+              <div class="tl-date">Mar 2025</div>
+              <div class="tl-body">
+                <h4>Stewardship Dinner</h4>
+                <p>Great conversation about the new capital campaign. Jonathan showed strong interest in naming opportunity for the library wing.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-dot gift"></div>
+              <div class="tl-date">Dec 2024</div>
+              <div class="tl-body">
+                <h4>Year-End Gift</h4>
+                <p>Annual fund contribution — 3rd consecutive year at this level.</p>
+              </div>
+              <div class="gift-amount">$25,000</div>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-dot email"></div>
+              <div class="tl-date">Oct 2024</div>
+              <div class="tl-body">
+                <h4>Impact Report Sent</h4>
+                <p>Personalized report highlighting outcomes from 2023 gift. Opened 3x, clicked program PDF.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-dot meeting"></div>
+              <div class="tl-date">Sep 2024</div>
+              <div class="tl-body">
+                <h4>1:1 with Executive Director</h4>
+                <p>Discussed his daughter's upcoming college plans and possible scholarship naming. Very positive meeting.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-dot gift"></div>
+              <div class="tl-date">May 2024</div>
+              <div class="tl-body">
+                <h4>Capital Campaign Gift</h4>
+                <p>First major gift toward campaign. Pledged over 3 years.</p>
+              </div>
+              <div class="gift-amount">$50,000</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Upcoming Moves</div>
+          <div class="timeline">
+            <div class="move-item">
+              <div class="move-check" onclick="toggleCheck(this)"></div>
+              <div class="move-body">
+                <h4>Schedule next cultivation meeting</h4>
+                <p>Propose lunch near his Midtown office to discuss library naming</p>
+              </div>
+              <div class="move-due soon">Apr 10</div>
+            </div>
+            <div class="move-item">
+              <div class="move-check done" onclick="toggleCheck(this)">✓</div>
+              <div class="move-body">
+                <h4>Send handwritten thank you note</h4>
+                <p>For attendance at Stewardship Dinner + gift renewal</p>
+              </div>
+              <div class="move-due">Done</div>
+            </div>
+            <div class="move-item">
+              <div class="move-check" onclick="toggleCheck(this)"></div>
+              <div class="move-body">
+                <h4>Share campaign case for support</h4>
+                <p>Tailored version emphasizing educational legacy & naming impact</p>
+              </div>
+              <div class="move-due">Apr 25</div>
+            </div>
+            <div class="move-item">
+              <div class="move-check" onclick="toggleCheck(this)"></div>
+              <div class="move-body">
+                <h4>Introduce to Program Director</h4>
+                <p>Arrange informal coffee to build second relationship in org</p>
+              </div>
+              <div class="move-due">May 2025</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: RESEARCH SIDEBAR -->
+      <div>
+        <div class="research-panel">
+          <div class="section-title">AI Intelligence Brief</div>
+          <div class="research-item">
+            <h4>Professional Background</h4>
+            <p>Managing Partner at <strong>Meridian Capital</strong> since 2011. Former Goldman Sachs MD. Focus: fintech & growth equity. AUM ~$800M.</p>
+          </div>
+          <div class="research-item">
+            <h4>Philanthropic Profile</h4>
+            <p>Active giving to <strong>3 education nonprofits</strong>. Trustee at Brooklyn Academy prep school. Strong interest in first-gen college access.</p>
+          </div>
+          <div class="research-item">
+            <h4>Connection Points</h4>
+            <p>Daughter starting university Fall 2026. Wife runs education NGO in Queens. Attends annual Milken Global Conference.</p>
+          </div>
+          <div class="research-item">
+            <h4>Sensitivities</h4>
+            <p>Prefers <strong>personal outreach</strong> — responded poorly to mass emails in 2023. Do not rush the ask. Relationship-first.</p>
+          </div>
+          <div class="research-item">
+            <h4>Recommended Ask</h4>
+            <p>Ready for a <strong>$75,000–$100,000</strong> naming conversation based on capacity & interest signals.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Contact Details</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="font-size:13px;">
+              <div style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:2px;">Email</div>
+              j.kessler@meridiancap.com
+            </div>
+            <div style="font-size:13px;">
+              <div style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:2px;">Phone</div>
+              +1 (212) 555-0198
+            </div>
+            <div style="font-size:13px;">
+              <div style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:2px;">LinkedIn</div>
+              <span style="color:var(--accent);">linkedin.com/in/jkessler</span>
+            </div>
+            <div style="font-size:13px;">
+              <div style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:2px;">Best Contact</div>
+              Email, Tue–Thu mornings
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const responses = {
+  research: {
+    label: '🔍 AI Research Report — Jonathan Kessler',
+    body: `<p>Jonathan Kessler is a high-capacity donor with strong alignment to your education mission. Key findings:</p>
+      <ul>
+        <li><strong>Career:</strong> Managing Partner at Meridian Capital since 2011. Estimated net worth $12–18M based on SEC filings and compensation data.</li>
+        <li><strong>Philanthropy:</strong> Has given to 6 organizations in the past 3 years. Three are education-focused, suggesting deep conviction. Average gift size: $40,000.</li>
+        <li><strong>Family angle:</strong> Daughter entering university in Fall 2026 — strong emotional hook for scholarship or student-facing naming opportunities.</li>
+        <li><strong>Public profile:</strong> Spoke at Milken Global 2024 on "Access to Capital in Education Tech." Publicly committed to improving first-gen college access.</li>
+        <li><strong>Warm signals:</strong> Opened your last 3 emails, clicked on scholarship program PDF twice. Attended voluntary event (stewardship dinner) with no solicitation pressure.</li>
+        <li><strong>Risk:</strong> Busy schedule. Responds well to personal, direct asks from ED — not mass campaigns. Previous lapsed period (2020–2021) coincided with high business demands.</li>
+      </ul>`
+  },
+  prep: {
+    label: '📋 Meeting Prep Brief — Jonathan Kessler',
+    body: `<p><strong>Meeting Goal:</strong> Advance toward a <span class="highlight">$75K–$100K naming gift conversation</span> for the library wing. Do not ask today — build the case.</p>
+      <ul>
+        <li><strong>Open with:</strong> His daughter's upcoming university transition. Ask where she's headed. Creates genuine rapport and links to your mission.</li>
+        <li><strong>Talk about:</strong> The library naming opportunity — frame it as a legacy and a gift his family will see grow over time.</li>
+        <li><strong>Bring:</strong> The updated case for support with naming diagram + impact metrics from the last gift.</li>
+        <li><strong>Sensitivity:</strong> He mentioned in September that his wife felt your last newsletter was "too generic." Acknowledge this — say you're improving your approach.</li>
+        <li><strong>Avoid:</strong> Rushing the number. Let him lead the ask-size conversation if possible.</li>
+        <li><strong>Next step from this meeting:</strong> Propose a site visit to the existing named spaces, with a 2-week follow-up call.</li>
+      </ul>
+      <p style="margin-top:12px;font-size:12px;color:rgba(255,255,255,0.45);">Suggested duration: 45–60 min. Setting: his office or quiet restaurant in Midtown.</p>`
+  },
+  moves: {
+    label: '🗺 Suggested Next Moves (6)',
+    body: `<p>Based on relationship history and stage, DonorMind recommends these cultivation moves:</p>
+      <ul>
+        <li><strong>Within 1 week:</strong> Send personal note from ED referencing the March dinner — warm, no ask.</li>
+        <li><strong>Week 2:</strong> Share a tailored impact story featuring a first-gen scholarship recipient.</li>
+        <li><strong>Week 3:</strong> Invite to an intimate program tour — max 6 people. Position as "exclusive preview."</li>
+        <li><strong>Month 2:</strong> Introduce to Program Director via curated coffee meeting, let relationship deepen naturally.</li>
+        <li><strong>Month 2–3:</strong> Share naming opportunity brochure — library wing. Personalize cover letter from ED.</li>
+        <li><strong>Month 3:</strong> Cultivation meeting with clear naming ask of $75K–$100K, pledge over 3 years.</li>
+      </ul>
+      <p style="margin-top:12px;"><button onclick="alert('6 moves added to pipeline!')" style="background:rgba(200,98,42,0.3);border:none;color:#f0a070;padding:8px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit;">+ Add all moves to pipeline</button></p>`
+  },
+  email: {
+    label: '✉ Draft Email — Meeting Request',
+    body: `<p>Here is a personalized meeting request based on Jonathan's history and interests:</p>
+      <div class="email-preview">
+        <div class="email-preview-header">
+          To: j.kessler@meridiancap.com · From: sarah@ycnpconsulting.org · Subject: Coffee soon?
+        </div>
+        <div class="email-preview-body">
+          Dear Jonathan,<br><br>
+          I've been thinking about our conversation at the dinner last month — especially what you shared about your vision for education access. It stuck with me.<br><br>
+          I'd love to find 45 minutes to reconnect in person. I have something I'd like to show you — a project that I think you'll find genuinely meaningful, and that connects to what you care most deeply about.<br><br>
+          Are you free for a quiet lunch or coffee in Midtown over the next few weeks? I'm flexible around your schedule.<br><br>
+          Warmly,<br>
+          Sarah Bondar<br>
+          YCNP Consulting
+        </div>
+      </div>
+      <p style="margin-top:10px;"><button onclick="alert('Copied to clipboard!')" style="background:rgba(200,98,42,0.3);border:none;color:#f0a070;padding:8px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit;">Copy Email</button></p>`
+  }
+};
+
+function triggerAI(type) {
+  const panel = document.getElementById('aiResponse');
+  const label = document.getElementById('aiLabel');
+  const body = document.getElementById('aiBody');
+  const spinner = document.getElementById('aiSpinner');
+
+  panel.classList.add('visible');
+  label.textContent = 'Thinking...';
+  body.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  spinner.style.display = 'block';
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  setTimeout(() => {
+    spinner.style.display = 'none';
+    const r = responses[type];
+    label.textContent = r.label;
+    body.innerHTML = r.body;
+  }, 1400);
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('done');
+  el.textContent = el.classList.contains('done') ? '✓' : '';
+  const dueEl = el.closest('.move-item').querySelector('.move-due');
+  if (el.classList.contains('done')) dueEl.textContent = 'Done';
+}
+</script>
+</body>
+</html>
