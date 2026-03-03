@@ -27,6 +27,11 @@ export default function SettingsPage() {
   const [authReady, setAuthReady] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const supabase = createClient();
+  const tabs = [
+    { id: "general", label: "General" },
+    { id: "fiscal_years", label: "Fiscal Years" },
+    { id: "members", label: "Team Members" },
+  ] as const;
 
   useEffect(() => {
     let cancelled = false;
@@ -300,63 +305,61 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="w-full space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-stone-900">Settings</h1>
-        <p className="text-stone-500 text-sm">Manage your organization preferences</p>
+    <div className="w-full max-w-6xl space-y-8">
+      <div className="space-y-1">
+        <h1 className="font-serif text-3xl font-medium tracking-tight text-stone-900">Settings</h1>
+        <p className="text-sm text-stone-500">Manage your organization preferences and account details</p>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-stone-200 flex gap-0">
-        <button
-          onClick={() => setActiveTab("general")}
-          className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "general" ? "border-orange-600 text-orange-600" : "border-transparent text-stone-500 hover:text-stone-800"}`}
-        >
-          General
-        </button>
-        <button
-          onClick={() => setActiveTab("fiscal_years")}
-          className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "fiscal_years" ? "border-orange-600 text-orange-600" : "border-transparent text-stone-500 hover:text-stone-800"}`}
-        >
-          Fiscal Years
-        </button>
-        <button
-          onClick={() => setActiveTab("members")}
-          className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "members" ? "border-orange-600 text-orange-600" : "border-transparent text-stone-500 hover:text-stone-800"}`}
-        >
-          Team Members
-        </button>
+      <div className="flex gap-1 border-b border-stone-200">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`relative px-5 py-3.5 text-sm font-medium transition-colors ${activeTab === tab.id ? "text-orange-600" : "text-stone-500 hover:text-stone-900"}`}
+          >
+            {tab.label}
+            <span
+              className={`absolute inset-x-0 bottom-0 h-0.5 rounded-full transition-opacity ${activeTab === tab.id ? "bg-orange-600 opacity-100" : "bg-transparent opacity-0"}`}
+            />
+          </button>
+        ))}
       </div>
 
       {/* Tab Content */}
       {activeTab === "general" && (
-        <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-6 max-w-2xl">
-          <h3 className="text-base font-semibold text-stone-900 mb-4">Organization Details</h3>
-          <form onSubmit={handleUpdateOrg} className="space-y-4">
+        <div className="max-w-3xl rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
+          <h3 className="font-serif text-xl font-medium text-stone-900">Organization Details</h3>
+          <p className="mt-1 text-sm leading-6 text-stone-500">
+            Basic information about your organization. This appears across the workspace.
+          </p>
+          <form onSubmit={handleUpdateOrg} className="mt-8 space-y-5">
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">Organization Name</label>
+              <label className="mb-1.5 block text-sm font-medium text-stone-700">Organization Name</label>
               <input
                 type="text"
                 value={orgForm.name}
                 onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
-                className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-stone-300 bg-stone-50 px-3.5 py-2.5 text-sm text-stone-900 transition-colors focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">Website</label>
+              <label className="mb-1.5 block text-sm font-medium text-stone-700">Website</label>
               <input
                 type="url"
                 value={orgForm.website}
                 onChange={(e) => setOrgForm({ ...orgForm, website: e.target.value })}
-                className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-stone-300 bg-stone-50 px-3.5 py-2.5 text-sm text-stone-900 transition-colors focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10"
                 placeholder="https://example.org"
               />
             </div>
-            <div className="pt-2">
+            <div className="flex items-center justify-between border-t border-stone-200 pt-5">
+              <p className="text-xs text-stone-500">Changes apply to your current organization workspace.</p>
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+                className="flex items-center gap-2 rounded-xl bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
               >
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                 Save Changes
@@ -367,9 +370,12 @@ export default function SettingsPage() {
       )}
 
       {activeTab === "fiscal_years" && (
-        <div>
-          <div className="flex items-center justify-between px-1 mb-3">
-            <h3 className="text-base font-semibold text-stone-900">Fiscal Years</h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-1">
+            <div>
+              <h3 className="font-serif text-xl font-medium text-stone-900">Fiscal Years</h3>
+              <p className="mt-1 text-sm text-stone-500">Manage the reporting periods used across the workspace.</p>
+            </div>
             <button className="text-sm text-orange-600 hover:underline flex items-center gap-1">
               <Plus className="w-3 h-3" /> Add Year
             </button>
@@ -413,7 +419,10 @@ export default function SettingsPage() {
       {activeTab === "members" && (
         <div className="space-y-6">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-base font-semibold text-stone-900">Team Members</h2>
+            <div>
+              <h2 className="font-serif text-xl font-medium text-stone-900">Team Members</h2>
+              <p className="mt-1 text-sm text-stone-500">Manage access for current members and pending invites.</p>
+            </div>
             <button
               type="button"
               onClick={() => {

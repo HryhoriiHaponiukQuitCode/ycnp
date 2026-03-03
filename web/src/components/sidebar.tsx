@@ -20,12 +20,15 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useEffect } from "react";
 
-const navItems = [
+const mainNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/donors", label: "Donors", icon: Users },
   { href: "/dashboard/moves", label: "Moves", icon: ArrowRightLeft },
   { href: "/dashboard/move-ideas", label: "Move Ideas", icon: Lightbulb },
   { href: "/dashboard/solicitors", label: "Solicitors", icon: UserCheck },
+];
+
+const systemNavItems = [
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
@@ -60,34 +63,40 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-56 bg-stone-900 flex flex-col z-50">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-stone-950 flex flex-col z-50">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-stone-800">
+      <div className="px-6 py-7 border-b border-white/5">
         <div className="flex items-center gap-2">
           <YCLogo className="w-6 h-6" alt="YC" />
           <span className="text-lg font-bold text-white tracking-tight">
             Donor<span className="text-orange-500">Mind</span>
           </span>
         </div>
-        <p className="text-[10px] text-stone-500 uppercase tracking-widest mt-0.5">
+        <p className="text-[10px] text-orange-500 uppercase tracking-[0.24em] mt-0.5 font-medium">
           Relationship Intelligence
         </p>
       </div>
 
       {/* Org Switcher */}
       {organizations.length > 0 && (
-        <div className="px-3 py-3 border-b border-stone-800 relative">
+        <div className="px-3 py-3 border-b border-white/5 relative">
           <button
             onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
-            className="w-full flex items-center justify-between px-2 py-1.5 text-sm text-stone-300 hover:text-white rounded-md hover:bg-stone-800 transition-colors"
+            className="w-full flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-3 text-left text-sm text-stone-300 transition-colors hover:bg-white/[0.07] hover:text-white"
           >
-            <span className="truncate text-xs font-medium">
-              {organization?.name || "Select Org"}
-            </span>
-            <ChevronDown className="w-3.5 h-3.5 flex-shrink-0" />
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-amber-400 text-xs font-bold text-white">
+              {(organization?.name || "O").slice(0, 2).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-semibold text-stone-50">
+                {organization?.name || "Select Org"}
+              </div>
+              <div className="text-xs text-stone-400">Workspace</div>
+            </div>
+            <ChevronDown className="h-4 w-4 flex-shrink-0 text-stone-400" />
           </button>
           {orgDropdownOpen && (
-            <div className="absolute left-3 right-3 top-full mt-1 bg-stone-800 rounded-lg shadow-lg border border-stone-700 z-50 py-1">
+            <div className="absolute left-3 right-3 top-full z-50 mt-2 rounded-xl border border-stone-800 bg-stone-900 py-1 shadow-lg">
               {organizations.map((org) => (
                 <button
                   key={org.id}
@@ -96,10 +105,10 @@ export function Sidebar() {
                     setOrgDropdownOpen(false);
                   }}
                   className={cn(
-                    "w-full text-left px-3 py-2 text-xs transition-colors",
+                    "w-full px-3 py-2 text-left text-xs transition-colors",
                     org.id === organization?.id
-                      ? "text-orange-400 bg-stone-700/50"
-                      : "text-stone-400 hover:text-white hover:bg-stone-700/30"
+                      ? "bg-orange-500/10 text-orange-300"
+                      : "text-stone-400 hover:bg-white/[0.04] hover:text-white"
                   )}
                 >
                   {org.name}
@@ -111,9 +120,12 @@ export function Sidebar() {
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 py-4 overflow-y-auto">
-        <div className="space-y-0.5 px-2">
-          {[...navItems, ...(isSuperAdmin ? [{ href: "/dashboard/super-admin", label: "Super Admin", icon: UserCog }] : [])].map((item) => {
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        <div className="space-y-1">
+          <div className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-stone-500">
+            Main
+          </div>
+          {mainNavItems.map((item) => {
             const isActive =
               item.href === "/dashboard"
                 ? pathname === "/dashboard"
@@ -124,13 +136,36 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all",
+                  "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all",
                   isActive
-                    ? "text-white bg-orange-600/20 border-l-2 border-orange-500"
-                    : "text-stone-400 hover:text-white hover:bg-stone-800 border-l-2 border-transparent"
+                    ? "bg-orange-500/10 text-orange-400 before:absolute before:-left-3 before:top-1/2 before:h-5 before:w-[3px] before:-translate-y-1/2 before:rounded-r-sm before:bg-orange-500"
+                    : "text-stone-400 hover:bg-white/[0.04] hover:text-stone-200"
                 )}
               >
-                <item.icon className="w-4 h-4" />
+                <item.icon className={cn("h-[18px] w-[18px]", isActive ? "opacity-100" : "opacity-70")} />
+                {item.label}
+              </Link>
+            );
+          })}
+
+          <div className="px-3 pt-5 pb-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-stone-500">
+            System
+          </div>
+          {[...systemNavItems, ...(isSuperAdmin ? [{ href: "/dashboard/super-admin", label: "Super Admin", icon: UserCog }] : [])].map((item) => {
+            const isActive = pathname.startsWith(item.href);
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all",
+                  isActive
+                    ? "bg-orange-500/10 text-orange-400 before:absolute before:-left-3 before:top-1/2 before:h-5 before:w-[3px] before:-translate-y-1/2 before:rounded-r-sm before:bg-orange-500"
+                    : "text-stone-400 hover:bg-white/[0.04] hover:text-stone-200"
+                )}
+              >
+                <item.icon className={cn("h-[18px] w-[18px]", isActive ? "opacity-100" : "opacity-70")} />
                 {item.label}
               </Link>
             );
@@ -139,12 +174,12 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-3 border-t border-stone-800">
+      <div className="border-t border-white/5 px-3 py-3">
         <button
           onClick={handleSignOut}
-          className="flex items-center gap-2 px-3 py-2 w-full text-sm text-stone-400 hover:text-white rounded-lg hover:bg-stone-800 transition-colors"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-stone-400 transition-colors hover:bg-white/[0.04] hover:text-white"
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut className="h-[18px] w-[18px]" />
           Sign Out
         </button>
       </div>
