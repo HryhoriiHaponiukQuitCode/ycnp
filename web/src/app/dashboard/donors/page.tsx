@@ -537,12 +537,25 @@ function formatNumber(value: number): string {
 }
 
 function formatCompactCurrency(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(value);
+  const absValue = Math.abs(value);
+
+  if (absValue >= 1_000_000_000) {
+    return `$${trimCompactDecimal(value / 1_000_000_000)}B`;
+  }
+
+  if (absValue >= 1_000_000) {
+    return `$${trimCompactDecimal(value / 1_000_000)}M`;
+  }
+
+  if (absValue >= 1_000) {
+    return `$${trimCompactDecimal(value / 1_000)}K`;
+  }
+
+  return formatCurrency(value).replace(".00", "");
+}
+
+function trimCompactDecimal(value: number): string {
+  return value.toFixed(1).replace(/\.0$/, "");
 }
 
 function StatCard({

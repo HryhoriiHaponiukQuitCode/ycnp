@@ -123,7 +123,7 @@ export default function MoveIdeasPage() {
       <div className="dm-table-shell">
         <div className="dm-table-scroll h-full">
           <table className="dm-table" style={{ minWidth: widths.reduce((a, b) => a + b, 0) }}>
-            <thead>
+            <thead className="sticky top-0 z-20">
               <tr>
                 {IDEA_HEADERS.map((label, i) => (
                   <th
