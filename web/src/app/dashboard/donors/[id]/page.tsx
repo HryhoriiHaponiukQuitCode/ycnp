@@ -391,67 +391,71 @@ export default function DonorDetailPage({ params }: { params: Promise<{ id: stri
                  No moves recorded yet.
                </div>
             ) : (
-               <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
-                 <table className="w-full text-sm">
+               <div className="dm-table-shell">
+                 <div className="dm-table-scroll">
+                 <table className="dm-table">
                     <thead>
-                      <tr className="bg-stone-100 border-b border-stone-200">
-                        <th className="text-left px-4 py-3 font-medium text-stone-600">Move</th>
-                        <th className="text-left px-4 py-3 font-medium text-stone-600">Status</th>
-                        <th className="text-left px-4 py-3 font-medium text-stone-600">Due / Completed</th>
-                        <th className="text-left px-4 py-3 font-medium text-stone-600">Assigned To</th>
+                      <tr>
+                        <th className="dm-table-head-cell">Move</th>
+                        <th className="dm-table-head-cell">Status</th>
+                        <th className="dm-table-head-cell">Due / Completed</th>
+                        <th className="dm-table-head-cell dm-table-head-cell-last">Assigned To</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-stone-100">
+                    <tbody>
                       {moves.map(move => (
-                        <tr key={move.id} className="hover:bg-stone-50/50">
-                          <td className="px-4 py-3 font-medium text-stone-800">{move.name}</td>
-                          <td className="px-4 py-3">
+                        <tr key={move.id} className="dm-table-row">
+                          <td className="dm-table-cell font-medium text-stone-800">{move.name}</td>
+                          <td className="dm-table-cell">
                             <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${move.is_completed ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                               {move.is_completed ? 'Completed' : 'Pending'}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-stone-600">
+                          <td className="dm-table-cell text-stone-500">
                             {move.is_completed ? formatDate(move.completed_at || move.updated_at) : formatDate(move.due_date)}
                           </td>
-                          <td className="px-4 py-3 text-stone-500">
+                          <td className="dm-table-cell dm-table-cell-last text-stone-500">
                             {move.assigned_to_name?.name || '—'}
                           </td>
                         </tr>
                       ))}
                     </tbody>
                  </table>
+                 </div>
                </div>
             )}
           </div>
         )}
         
         {activeTab === "donations" && (
-           <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
+           <div className="dm-table-shell">
              {donations.length === 0 ? (
                 <div className="p-8 text-center text-stone-500">No donations recorded.</div>
              ) : (
-                <table className="w-full text-sm">
+                <div className="dm-table-scroll">
+                <table className="dm-table">
                    <thead>
-                     <tr className="bg-stone-100 border-b border-stone-200">
-                       <th className="text-left px-4 py-3 font-medium w-32">Date</th>
-                       <th className="text-right px-4 py-3 font-medium w-32">Amount</th>
-                       <th className="text-left px-4 py-3 font-medium">Type</th>
-                       <th className="text-left px-4 py-3 font-medium">Description</th>
+                     <tr>
+                       <th className="dm-table-head-cell w-32">Date</th>
+                       <th className="dm-table-head-cell w-32 text-right">Amount</th>
+                       <th className="dm-table-head-cell">Type</th>
+                       <th className="dm-table-head-cell dm-table-head-cell-last">Description</th>
                      </tr>
                    </thead>
-                   <tbody className="divide-y divide-stone-100">
+                   <tbody>
                       {donations.map(donation => (
-                        <tr key={donation.id}>
-                          <td className="px-4 py-3 text-stone-600">{formatDate(donation.donated_at)}</td>
-                          <td className="px-4 py-3 text-right font-medium text-stone-800">{formatCurrency(donation.amount)}</td>
-                          <td className="px-4 py-3">
+                        <tr key={donation.id} className="dm-table-row">
+                          <td className="dm-table-cell text-stone-500">{formatDate(donation.donated_at)}</td>
+                          <td className="dm-table-cell text-right font-medium text-stone-800">{formatCurrency(donation.amount)}</td>
+                          <td className="dm-table-cell">
                              <span className="capitalize px-2 py-0.5 bg-stone-100 rounded text-xs text-stone-600">{donation.donation_type}</span>
                           </td>
-                          <td className="px-4 py-3 text-stone-500">{donation.description || '—'}</td>
+                          <td className="dm-table-cell dm-table-cell-last text-stone-500">{donation.description || '—'}</td>
                         </tr>
                       ))}
                    </tbody>
                 </table>
+                </div>
              )}
            </div>
         )}

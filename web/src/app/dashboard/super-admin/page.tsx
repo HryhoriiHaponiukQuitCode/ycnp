@@ -378,34 +378,36 @@ export default function SuperAdminPage() {
             <p className="text-sm">Loading organizations…</p>
           </div>
         ) : (
-          <div className="overflow-auto border border-stone-200 bg-white">
-            <table className="w-full text-sm border-separate border-spacing-0">
+          <div className="dm-table-shell">
+            <div className="dm-table-scroll">
+            <table className="dm-table">
               <thead>
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">Name</th>
-                  <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">Website</th>
-                  <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-stone-200">Created</th>
+                  <th className="dm-table-head-cell sticky top-0 z-20">Name</th>
+                  <th className="dm-table-head-cell sticky top-0 z-20">Website</th>
+                  <th className="dm-table-head-cell dm-table-head-cell-last sticky top-0 z-20">Created</th>
                 </tr>
               </thead>
               <tbody>
                 {orgs.map((o) => (
-                  <tr key={o.id} className="hover:bg-stone-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-stone-900 whitespace-nowrap border-b border-r border-stone-200">{o.name}</td>
-                    <td className="px-4 py-3 text-stone-600 whitespace-nowrap border-b border-r border-stone-200">
+                  <tr key={o.id} className="dm-table-row">
+                    <td className="dm-table-cell font-medium text-stone-900">{o.name}</td>
+                    <td className="dm-table-cell text-stone-500">
                       {o.website ? (
                         <a href={o.website} target="_blank" rel="noopener noreferrer" className="text-stone-700 hover:text-orange-600 underline-offset-2 hover:underline">{o.website}</a>
                       ) : ""}
                     </td>
-                    <td className="px-4 py-3 text-stone-500 whitespace-nowrap border-b border-stone-200">{o.created_at ? formatDate(o.created_at) : ""}</td>
+                    <td className="dm-table-cell dm-table-cell-last text-stone-500">{o.created_at ? formatDate(o.created_at) : ""}</td>
                   </tr>
                 ))}
                 {orgs.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="px-4 py-8 text-center text-stone-400">No organizations found.</td>
+                    <td colSpan={3} className="dm-table-empty">No organizations found.</td>
                   </tr>
                 )}
               </tbody>
             </table>
+            </div>
           </div>
         )}
       </div>

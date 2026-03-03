@@ -380,23 +380,24 @@ export default function SettingsPage() {
               <Plus className="w-3 h-3" /> Add Year
             </button>
           </div>
-          <div className="overflow-auto border border-stone-200 bg-white">
-            <table className="w-full text-sm border-separate border-spacing-0">
+          <div className="dm-table-shell">
+            <div className="dm-table-scroll">
+            <table className="dm-table">
               <thead>
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">Label</th>
-                  <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">Start Date</th>
-                  <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">End Date</th>
-                  <th className="text-center px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-stone-200">Status</th>
+                  <th className="dm-table-head-cell sticky top-0 z-20">Label</th>
+                  <th className="dm-table-head-cell sticky top-0 z-20">Start Date</th>
+                  <th className="dm-table-head-cell sticky top-0 z-20">End Date</th>
+                  <th className="dm-table-head-cell dm-table-head-cell-last sticky top-0 z-20 text-center">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {fiscalYears.map(fy => (
-                  <tr key={fy.id} className="hover:bg-stone-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-stone-800 whitespace-nowrap border-b border-r border-stone-200">{fy.label}</td>
-                    <td className="px-4 py-3 text-stone-600 whitespace-nowrap border-b border-r border-stone-200">{formatDate(fy.start_date)}</td>
-                    <td className="px-4 py-3 text-stone-600 whitespace-nowrap border-b border-r border-stone-200">{formatDate(fy.end_date)}</td>
-                    <td className="px-4 py-3 text-center whitespace-nowrap border-b border-stone-200">
+                  <tr key={fy.id} className="dm-table-row">
+                    <td className="dm-table-cell font-medium text-stone-800">{fy.label}</td>
+                    <td className="dm-table-cell text-stone-500">{formatDate(fy.start_date)}</td>
+                    <td className="dm-table-cell text-stone-500">{formatDate(fy.end_date)}</td>
+                    <td className="dm-table-cell dm-table-cell-last text-center">
                       {fy.is_current ? (
                         <span className="inline-block px-2.5 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">Current</span>
                       ) : (
@@ -407,11 +408,12 @@ export default function SettingsPage() {
                 ))}
                 {fiscalYears.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-stone-400 text-sm">No fiscal years configured</td>
+                    <td colSpan={4} className="dm-table-empty">No fiscal years configured</td>
                   </tr>
                 )}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       )}
@@ -527,64 +529,68 @@ export default function SettingsPage() {
           {/* Members table */}
           <div>
             <h3 className="text-base font-semibold text-stone-900 px-1 mb-3">Current Members</h3>
-            <div className="overflow-auto border border-stone-200 bg-white">
-              <table className="w-full text-sm border-separate border-spacing-0">
+            <div className="dm-table-shell">
+              <div className="dm-table-scroll">
+              <table className="dm-table">
                 <thead>
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">Email</th>
-                    <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">Role</th>
-                    <th className="text-right px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-stone-200">Joined</th>
+                    <th className="dm-table-head-cell sticky top-0 z-20">Email</th>
+                    <th className="dm-table-head-cell sticky top-0 z-20">Role</th>
+                    <th className="dm-table-head-cell dm-table-head-cell-last sticky top-0 z-20 text-right">Joined</th>
                   </tr>
                 </thead>
                 <tbody>
                   {members.map(member => (
-                    <tr key={member.id} className="hover:bg-stone-50 transition-colors">
-                      <td className="px-4 py-3 text-stone-600 whitespace-nowrap border-b border-r border-stone-200">{member.email || "—"}</td>
-                      <td className="px-4 py-3 capitalize text-stone-800 whitespace-nowrap border-b border-r border-stone-200">{member.role}</td>
-                      <td className="px-4 py-3 text-right text-stone-500 whitespace-nowrap border-b border-stone-200">{formatDate(member.created_at)}</td>
+                    <tr key={member.id} className="dm-table-row">
+                      <td className="dm-table-cell text-stone-500">{member.email || "—"}</td>
+                      <td className="dm-table-cell capitalize text-stone-800">{member.role}</td>
+                      <td className="dm-table-cell dm-table-cell-last text-right text-stone-500">{formatDate(member.created_at)}</td>
                     </tr>
                   ))}
                   {members.length === 0 && (
                     <tr>
-                      <td colSpan={3} className="px-4 py-8 text-center text-stone-400 text-sm">No members yet</td>
+                      <td colSpan={3} className="dm-table-empty">No members yet</td>
                     </tr>
                   )}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
 
           {/* Pending invites table */}
           <div>
             <h3 className="text-base font-semibold text-stone-900 px-1 mb-3">Pending Invites</h3>
-            <div className="overflow-auto border border-stone-200 bg-white">
-              <table className="w-full text-sm border-separate border-spacing-0">
+            <div className="dm-table-shell">
+              <div className="dm-table-scroll">
+              <table className="dm-table">
                 <thead>
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">Email</th>
-                    <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">Role</th>
-                    <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">Created</th>
-                    <th className="text-right px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-stone-200">Actions</th>
+                    <th className="dm-table-head-cell sticky top-0 z-20">Email</th>
+                    <th className="dm-table-head-cell sticky top-0 z-20">Role</th>
+                    <th className="dm-table-head-cell sticky top-0 z-20">Created</th>
+                    <th className="dm-table-head-cell dm-table-head-cell-last sticky top-0 z-20 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {invites.map((i) => (
-                    <tr key={i.id} className="hover:bg-stone-50 transition-colors">
-                      <td className="px-4 py-3 font-medium text-stone-800 whitespace-nowrap border-b border-r border-stone-200">{i.email}</td>
-                      <td className="px-4 py-3 text-stone-600 capitalize whitespace-nowrap border-b border-r border-stone-200">{i.role}</td>
-                      <td className="px-4 py-3 text-stone-500 whitespace-nowrap border-b border-r border-stone-200">{i.created_at ? formatDate(i.created_at) : ""}</td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap border-b border-stone-200">
+                    <tr key={i.id} className="dm-table-row">
+                      <td className="dm-table-cell font-medium text-stone-800">{i.email}</td>
+                      <td className="dm-table-cell capitalize text-stone-500">{i.role}</td>
+                      <td className="dm-table-cell text-stone-500">{i.created_at ? formatDate(i.created_at) : ""}</td>
+                      <td className="dm-table-cell dm-table-cell-last text-right">
                         <button onClick={() => handleRevokeInvite(i.id)} className="text-sm text-red-600 hover:underline">Revoke</button>
                       </td>
                     </tr>
                   ))}
                   {invites.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-stone-400 text-sm">No pending invites</td>
+                      <td colSpan={4} className="dm-table-empty">No pending invites</td>
                     </tr>
                   )}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         </div>

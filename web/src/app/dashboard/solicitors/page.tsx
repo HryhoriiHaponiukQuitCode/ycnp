@@ -78,10 +78,10 @@ export default function SolicitorsPage() {
   };
 
   const { widths, onMouseDown } = useResizableColumns(SOL_COLUMNS);
-  const thBase = "text-left font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200 relative select-none";
-  const thFirst = "text-left font-medium text-stone-600 whitespace-nowrap sticky top-0 left-0 z-30 bg-stone-100 border-b border-r border-stone-200 relative select-none";
+  const thBase = "dm-table-head-cell sticky top-0 z-20 relative select-none";
+  const thFirst = "dm-table-head-cell dm-table-head-cell-sticky sticky top-0 z-30 relative select-none";
   const resizeHandle = "absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-orange-400/60 active:bg-orange-500/80 z-40";
-  const tdBase = "whitespace-nowrap border-b border-r border-stone-200 overflow-hidden text-ellipsis";
+  const tdBase = "dm-table-cell overflow-hidden text-ellipsis";
 
   return (
     <div className="w-full h-[calc(100vh-5rem)] flex flex-col gap-4">
@@ -114,18 +114,18 @@ export default function SolicitorsPage() {
       </div>
 
       {/* Table */}
-      <div className="flex-1 min-h-0">
-        <div className="overflow-auto overscroll-none h-full border border-stone-200 bg-white">
-          <table className="w-full text-sm border-separate border-spacing-0" style={{ minWidth: widths.reduce((a, b) => a + b, 0) }}>
+      <div className="dm-table-shell">
+        <div className="dm-table-scroll h-full">
+          <table className="dm-table" style={{ minWidth: widths.reduce((a, b) => a + b, 0) }}>
             <thead>
               <tr>
                 {SOL_HEADERS.map((label, i) => (
                   <th
                     key={SOL_COLUMNS[i].key}
-                    className={i === 0 ? thFirst : (i === SOL_HEADERS.length - 1 ? thBase.replace("border-r ", "") : thBase)}
+                    className={cn(i === 0 ? thFirst : thBase, i === SOL_HEADERS.length - 1 && "dm-table-head-cell-last")}
                     style={{ width: widths[i], minWidth: SOL_COLUMNS[i].minWidth }}
                   >
-                    <div className="px-4 py-3">{label}</div>
+                    <div className="flex h-full items-center">{label}</div>
                     <div className={resizeHandle} onMouseDown={(e) => onMouseDown(i, e)} />
                   </th>
                 ))}
@@ -134,20 +134,20 @@ export default function SolicitorsPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={13} className="px-4 py-12 text-center">
+                  <td colSpan={13} className="dm-table-empty">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-stone-400" />
                   </td>
                 </tr>
               ) : solicitors.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="px-4 py-12 text-center text-stone-400">
+                  <td colSpan={13} className="dm-table-empty">
                     {search ? "No solicitors match your search" : "No solicitors yet. Add your team members!"}
                   </td>
                 </tr>
               ) : (
                 solicitors.map((sol) => (
-                  <tr key={sol.id} className="hover:bg-stone-50 transition-colors group">
-                    <td className="px-4 py-3 whitespace-nowrap sticky left-0 z-10 bg-white border-b border-r border-stone-200 group-hover:bg-stone-50 overflow-hidden text-ellipsis" style={{ width: widths[0], maxWidth: widths[0] }}>
+                  <tr key={sol.id} className="dm-table-row group">
+                    <td className="dm-table-cell dm-table-cell-sticky overflow-hidden text-ellipsis" style={{ width: widths[0], maxWidth: widths[0] }}>
                       <span className="font-medium text-stone-800">{sol.name}</span>
                     </td>
                     <td className={cn("px-4 py-3", tdBase)} style={{ width: widths[1], maxWidth: widths[1] }}>
@@ -175,7 +175,7 @@ export default function SolicitorsPage() {
                     <td className={cn("px-4 py-3 text-center text-stone-600", tdBase)} style={{ width: widths[9], maxWidth: widths[9] }}>{fmt(sol.total_moves_needed)}</td>
                     <td className={cn("px-4 py-3 text-center text-stone-600", tdBase)} style={{ width: widths[10], maxWidth: widths[10] }}>{fmt(sol.moves_scheduled)}</td>
                     <td className={cn("px-4 py-3 text-center text-stone-600", tdBase)} style={{ width: widths[11], maxWidth: widths[11] }}>{fmt(sol.moves_completed)}</td>
-                    <td className="px-4 py-3 text-center whitespace-nowrap border-b border-stone-200" style={{ width: widths[12], maxWidth: widths[12] }}>
+                    <td className="dm-table-cell dm-table-cell-last text-center whitespace-nowrap" style={{ width: widths[12], maxWidth: widths[12] }}>
                       <div className="flex items-center gap-2 justify-center">
                         <div className="w-16 h-2 bg-stone-100 rounded-full overflow-hidden">
                           <div className="h-full bg-green-500 rounded-full" style={{ width: `${Math.min(100, sol.completion_percentage || 0)}%` }} />

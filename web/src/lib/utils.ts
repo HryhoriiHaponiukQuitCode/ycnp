@@ -47,6 +47,58 @@ export function getGenerosityColor(score: string | null | undefined): string {
   }
 }
 
+export function getGenerosityTableTheme(score: string | null | undefined): {
+  badge: string;
+  avatar: string;
+  dot: string;
+} {
+  switch (score) {
+    case "On Fire!":
+      return {
+        badge: "bg-red-50 text-red-600",
+        avatar: "bg-red-50 text-red-600",
+        dot: "bg-red-500",
+      };
+    case "Hot":
+      return {
+        badge: "bg-orange-50 text-orange-600",
+        avatar: "bg-orange-50 text-orange-600",
+        dot: "bg-orange-500",
+      };
+    case "Warm":
+      return {
+        badge: "bg-amber-50 text-amber-600",
+        avatar: "bg-amber-50 text-amber-600",
+        dot: "bg-amber-500",
+      };
+    case "Cool":
+      return {
+        badge: "bg-blue-50 text-blue-600",
+        avatar: "bg-blue-50 text-blue-600",
+        dot: "bg-blue-500",
+      };
+    case "Cold":
+      return {
+        badge: "bg-violet-50 text-violet-600",
+        avatar: "bg-violet-50 text-violet-600",
+        dot: "bg-violet-500",
+      };
+    default:
+      return {
+        badge: "bg-stone-100 text-stone-600",
+        avatar: "bg-stone-100 text-stone-600",
+        dot: "bg-stone-400",
+      };
+  }
+}
+
+export function getInitials(value: string | null | undefined): string {
+  if (!value) return "DM";
+  const parts = value.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] ?? ""}${parts[parts.length - 1][0] ?? ""}`.toUpperCase();
+}
+
 export function generateSlug(name: string): string {
   return name
     .toLowerCase()

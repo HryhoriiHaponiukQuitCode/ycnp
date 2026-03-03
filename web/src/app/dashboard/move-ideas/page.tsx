@@ -84,10 +84,10 @@ export default function MoveIdeasPage() {
     arr && arr.length > 0 ? arr.join(", ") : "";
 
   const { widths, onMouseDown } = useResizableColumns(IDEA_COLUMNS);
-  const thBase = "text-left font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200 relative select-none";
-  const thFirst = "text-left font-medium text-stone-600 whitespace-nowrap sticky top-0 left-0 z-30 bg-stone-100 border-b border-r border-stone-200 relative select-none";
+  const thBase = "dm-table-head-cell sticky top-0 z-20 relative select-none";
+  const thFirst = "dm-table-head-cell dm-table-head-cell-sticky sticky top-0 z-30 relative select-none";
   const resizeHandle = "absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-orange-400/60 active:bg-orange-500/80 z-40";
-  const tdBase = "whitespace-nowrap border-b border-r border-stone-200 overflow-hidden text-ellipsis";
+  const tdBase = "dm-table-cell overflow-hidden text-ellipsis";
 
   return (
     <div className="w-full h-[calc(100vh-5rem)] flex flex-col gap-4">
@@ -120,18 +120,18 @@ export default function MoveIdeasPage() {
       </div>
 
       {/* Table */}
-      <div className="flex-1 min-h-0">
-        <div className="overflow-auto overscroll-none h-full border border-stone-200 bg-white">
-          <table className="w-full text-sm border-separate border-spacing-0" style={{ minWidth: widths.reduce((a, b) => a + b, 0) }}>
+      <div className="dm-table-shell">
+        <div className="dm-table-scroll h-full">
+          <table className="dm-table" style={{ minWidth: widths.reduce((a, b) => a + b, 0) }}>
             <thead>
               <tr>
                 {IDEA_HEADERS.map((label, i) => (
                   <th
                     key={IDEA_COLUMNS[i].key}
-                    className={i === 0 ? thFirst : (i === IDEA_HEADERS.length - 1 ? thBase.replace("border-r ", "") : thBase)}
+                    className={cn(i === 0 ? thFirst : thBase, i === IDEA_HEADERS.length - 1 && "dm-table-head-cell-last")}
                     style={{ width: widths[i], minWidth: IDEA_COLUMNS[i].minWidth }}
                   >
-                    <div className="px-4 py-3">{label}</div>
+                    <div className="flex h-full items-center">{label}</div>
                     <div className={resizeHandle} onMouseDown={(e) => onMouseDown(i, e)} />
                   </th>
                 ))}
@@ -140,20 +140,20 @@ export default function MoveIdeasPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center">
+                  <td colSpan={6} className="dm-table-empty">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-stone-400" />
                   </td>
                 </tr>
               ) : ideas.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-stone-400">
+                  <td colSpan={6} className="dm-table-empty">
                     {search ? "No ideas match your search" : "No move ideas yet. Add your first idea!"}
                   </td>
                 </tr>
               ) : (
                 ideas.map((idea) => (
-                  <tr key={idea.id} className="hover:bg-stone-50 transition-colors group">
-                    <td className="px-4 py-3 whitespace-nowrap sticky left-0 z-10 bg-white border-b border-r border-stone-200 group-hover:bg-stone-50 overflow-hidden text-ellipsis" style={{ width: widths[0], maxWidth: widths[0] }}>
+                  <tr key={idea.id} className="dm-table-row group">
+                    <td className="dm-table-cell dm-table-cell-sticky overflow-hidden text-ellipsis" style={{ width: widths[0], maxWidth: widths[0] }}>
                       <div className="flex items-center gap-2">
                         <span className={cn("p-1 rounded", idea.is_global ? "text-purple-600" : "text-orange-600")}>
                           {idea.is_global ? <Globe className="w-3.5 h-3.5" /> : <Lightbulb className="w-3.5 h-3.5" />}
@@ -173,7 +173,7 @@ export default function MoveIdeasPage() {
                     <td className={cn("px-4 py-3 text-stone-600", tdBase)} style={{ width: widths[2], maxWidth: widths[2] }}>{formatArray(idea.purpose)}</td>
                     <td className={cn("px-4 py-3 text-stone-600", tdBase)} style={{ width: widths[3], maxWidth: widths[3] }}>{formatArray(idea.methods)}</td>
                     <td className={cn("px-4 py-3 text-stone-600", tdBase, "truncate")} style={{ width: widths[4], maxWidth: widths[4] }}>{idea.notes || ""}</td>
-                    <td className="px-4 py-3 text-center border-b border-stone-200" style={{ width: widths[5], maxWidth: widths[5] }}>
+                    <td className="dm-table-cell dm-table-cell-last text-center" style={{ width: widths[5], maxWidth: widths[5] }}>
                       {!idea.is_global && (
                         <button onClick={() => handleDelete(idea.id)} className="text-stone-300 hover:text-red-500 transition-colors p-1" title="Delete idea">
                           <Trash2 className="w-4 h-4" />

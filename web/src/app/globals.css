@@ -12,6 +12,64 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@layer components {
+  .dm-table-shell {
+    @apply flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-stone-300 bg-white shadow-sm;
+  }
+
+  .dm-table-scroll {
+    @apply min-h-0 flex-1 overflow-auto overscroll-none;
+  }
+
+  .dm-table {
+    @apply w-full border-separate border-spacing-0 text-sm;
+  }
+
+  .dm-table-head-cell {
+    @apply relative h-11 whitespace-nowrap border-b border-r border-stone-200 bg-stone-50 px-4 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500;
+  }
+
+  .dm-table-head-cell-sticky {
+    @apply sticky left-0 z-30 bg-stone-50 shadow-[1px_0_0_0_theme(colors.stone.200)];
+  }
+
+  .dm-table-head-cell-last {
+    @apply border-r-0;
+  }
+
+  .dm-table-row {
+    @apply transition-colors hover:bg-stone-50/60;
+  }
+
+  .dm-table-cell {
+    @apply h-[52px] whitespace-nowrap border-b border-r border-stone-200 px-4 align-middle text-[13px] text-stone-700;
+  }
+
+  .dm-table-cell-last {
+    @apply border-r-0;
+  }
+
+  .dm-table-cell-sticky {
+    @apply sticky left-0 z-10 bg-white shadow-[1px_0_0_0_theme(colors.stone.200)];
+  }
+
+  .dm-table-empty {
+    @apply px-4 py-12 text-center text-sm text-stone-400;
+  }
+
+  .dm-table-footer {
+    @apply flex items-center justify-between border-t border-stone-200 bg-stone-50/70 px-4 py-3;
+  }
+
+  .dm-page-btn {
+    @apply flex h-9 min-w-9 items-center justify-center rounded-lg border border-transparent px-3 text-sm font-medium text-stone-500 transition-colors hover:bg-white hover:text-stone-900 disabled:cursor-default disabled:opacity-30;
+  }
+
+  .dm-page-btn-active {
+    @apply border-stone-900 bg-stone-900 text-white hover:bg-stone-900 hover:text-white;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

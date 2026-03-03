@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useOrganization } from "@/lib/context/org-context";
-import { YCLogo } from "@/components/yc-logo";
 import {
   LayoutDashboard,
   Users,
@@ -66,13 +65,12 @@ export function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-64 bg-stone-950 flex flex-col z-50">
       {/* Logo */}
       <div className="px-6 py-7 border-b border-white/5">
-        <div className="flex items-center gap-2">
-          <YCLogo className="w-6 h-6" alt="YC" />
+        <div className="flex items-center">
           <span className="text-lg font-bold text-white tracking-tight">
             Donor<span className="text-orange-500">Mind</span>
           </span>
         </div>
-        <p className="text-[10px] text-orange-500 uppercase tracking-[0.24em] mt-0.5 font-medium">
+        <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.24em] text-white">
           Relationship Intelligence
         </p>
       </div>
