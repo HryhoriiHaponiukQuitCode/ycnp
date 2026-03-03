@@ -401,7 +401,7 @@ export default function SuperAdminPage() {
                 ))}
                 {orgs.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="px-4 py-8 text-center text-stone-400 border-b border-stone-200">No organizations found.</td>
+                    <td colSpan={3} className="px-4 py-8 text-center text-stone-400">No organizations found.</td>
                   </tr>
                 )}
               </tbody>

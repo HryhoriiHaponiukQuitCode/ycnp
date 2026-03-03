@@ -83,9 +83,7 @@ export default function SettingsPage() {
       setFiscalYears(fyData || []);
       // Load members
       const { data: memberData } = await supabase
-        .from("org_members")
-        .select("*")
-        .eq("organization_id", organization.id);
+        .rpc("get_org_members_with_emails", { p_organization_id: organization.id });
       setMembers(memberData || []);
 
       const { data: inviteData } = await supabase
@@ -403,7 +401,7 @@ export default function SettingsPage() {
                 ))}
                 {fiscalYears.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-stone-400 text-sm border-b border-stone-200">No fiscal years configured</td>
+                    <td colSpan={4} className="px-4 py-8 text-center text-stone-400 text-sm">No fiscal years configured</td>
                   </tr>
                 )}
               </tbody>
@@ -524,7 +522,7 @@ export default function SettingsPage() {
               <table className="w-full text-sm border-separate border-spacing-0">
                 <thead>
                   <tr>
-                    <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">User ID</th>
+                    <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">Email</th>
                     <th className="text-left px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-r border-stone-200">Role</th>
                     <th className="text-right px-4 py-3 font-medium text-stone-600 whitespace-nowrap sticky top-0 z-20 bg-stone-100 border-b border-stone-200">Joined</th>
                   </tr>
@@ -532,14 +530,14 @@ export default function SettingsPage() {
                 <tbody>
                   {members.map(member => (
                     <tr key={member.id} className="hover:bg-stone-50 transition-colors">
-                      <td className="px-4 py-3 text-stone-500 text-xs font-mono whitespace-nowrap border-b border-r border-stone-200">{member.user_id}</td>
+                      <td className="px-4 py-3 text-stone-600 whitespace-nowrap border-b border-r border-stone-200">{member.email || "—"}</td>
                       <td className="px-4 py-3 capitalize text-stone-800 whitespace-nowrap border-b border-r border-stone-200">{member.role}</td>
                       <td className="px-4 py-3 text-right text-stone-500 whitespace-nowrap border-b border-stone-200">{formatDate(member.created_at)}</td>
                     </tr>
                   ))}
                   {members.length === 0 && (
                     <tr>
-                      <td colSpan={3} className="px-4 py-8 text-center text-stone-400 text-sm border-b border-stone-200">No members yet</td>
+                      <td colSpan={3} className="px-4 py-8 text-center text-stone-400 text-sm">No members yet</td>
                     </tr>
                   )}
                 </tbody>
@@ -573,7 +571,7 @@ export default function SettingsPage() {
                   ))}
                   {invites.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-stone-400 text-sm border-b border-stone-200">No pending invites</td>
+                      <td colSpan={4} className="px-4 py-8 text-center text-stone-400 text-sm">No pending invites</td>
                     </tr>
                   )}
                 </tbody>

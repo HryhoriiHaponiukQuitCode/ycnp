@@ -85,7 +85,7 @@ export default function SolicitorsPage() {
 
   return (
     <div className="w-full h-[calc(100vh-5rem)] flex flex-col gap-4">
-      <div className="flex items-center justify-between px-4 pt-4">
+      <div className="flex items-center justify-between pt-4">
         <div>
           <h1 className="text-2xl font-bold text-stone-800">Solicitors</h1>
           <p className="text-stone-500 text-sm">
@@ -102,8 +102,8 @@ export default function SolicitorsPage() {
       </div>
 
       {/* Search */}
-      <div className="relative px-4">
-        <Search className="absolute left-7 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
         <input
           type="text"
           value={search}
@@ -134,13 +134,13 @@ export default function SolicitorsPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={13} className="px-4 py-12 text-center border-b border-stone-200">
+                  <td colSpan={13} className="px-4 py-12 text-center">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-stone-400" />
                   </td>
                 </tr>
               ) : solicitors.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="px-4 py-12 text-center text-stone-400 border-b border-stone-200">
+                  <td colSpan={13} className="px-4 py-12 text-center text-stone-400">
                     {search ? "No solicitors match your search" : "No solicitors yet. Add your team members!"}
                   </td>
                 </tr>
