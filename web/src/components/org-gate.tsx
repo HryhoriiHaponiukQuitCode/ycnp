@@ -95,7 +95,8 @@ export function OrgGate({ children }: OrgGateProps) {
     setCreating(false);
   }
 
-  const shouldBlock = loading || !organization;
+  const readyForDecision = !loading && authReady && isSuperAdmin !== null;
+  const shouldBlock = readyForDecision && !organization;
 
   return (
     <div className="relative min-h-screen">
@@ -111,17 +112,7 @@ export function OrgGate({ children }: OrgGateProps) {
               </p>
             </div>
 
-            {loading ? (
-              <div className="py-6 flex flex-col items-center gap-3 text-stone-600">
-                <Loader2 className="w-6 h-6 animate-spin text-orange-600" />
-                <p className="text-sm">Завантаження...</p>
-              </div>
-            ) : !authReady || isSuperAdmin === null ? (
-              <div className="py-6 flex flex-col items-center gap-3 text-stone-600">
-                <Loader2 className="w-6 h-6 animate-spin text-orange-600" />
-                <p className="text-sm">Checking permissions…</p>
-              </div>
-            ) : !isSuperAdmin ? (
+            {!isSuperAdmin ? (
               <div className="space-y-3 text-center">
                 <p className="text-sm text-stone-700 font-medium">
                   {isLoggedIn ? "You don’t have permission to create organizations." : "You’re not signed in."}

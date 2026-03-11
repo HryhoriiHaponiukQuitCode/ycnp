@@ -438,7 +438,7 @@ function AddMoveModal({
   const [saving, setSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [donors, setDonors] = useState<any[]>([]);
-  const [solicitors, setSolicitors] = useState<any[]>([]);
+  const [assignees, setAssignees] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     donor_id: "",
@@ -449,15 +449,14 @@ function AddMoveModal({
   const supabase = createClient();
 
   useEffect(() => {
-    // Determine fiscal year if needed, but for now just load solicitors
     async function loadResources() {
       const { data: solData } = await supabase
-        .from("solicitors") // Should use v_solicitor_summary or solicitors table
+        .from("v_solicitor_summary")
         .select("id, name")
         .eq("organization_id", organizationId)
         .eq("is_active", true);
       
-      if (solData) setSolicitors(solData);
+      if (solData) setAssignees(solData);
     }
     loadResources();
   }, [organizationId]);
@@ -580,7 +579,7 @@ function AddMoveModal({
                  className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
                >
                  <option value="">Unassigned</option>
-                 {solicitors.map(s => (
+                 {assignees.map((s) => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                  ))}
                </select>

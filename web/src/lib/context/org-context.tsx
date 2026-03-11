@@ -29,24 +29,37 @@ export function OrgProvider({ children }: { children: ReactNode }) {
   const supabase = createClient();
 
   const loadOrgs = async () => {
-    // Only load orgs the authenticated user is a member of.
-    // This avoids exposing all organizations to any signed-in user.
-    const { data } = await supabase
-      .from("org_members")
-      .select("organizations(*)")
-      .order("created_at", { ascending: false });
+    setLoading(true);
 
-    const rawOrgs = (data || [])
-      .map((row: any) => row.organizations)
-      .filter(Boolean) as Organization[];
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    // Defensive: if the join returns duplicates (or org_members has duplicates),
-    // ensure org IDs are unique to avoid React key collisions.
-    const orgMap = new Map<string, Organization>();
-    for (const org of rawOrgs) {
-      if (!orgMap.has(org.id)) orgMap.set(org.id, org);
+    if (!session) {
+      setOrganizations([]);
+      setOrganization(null);
+      setLoading(false);
+      return;
     }
-    const orgs = Array.from(orgMap.values());
+
+    const [{ data: isSuperAdmin }, { data: userOrgIds }] = await Promise.all([
+      supabase.rpc("is_super_admin"),
+      supabase.rpc("get_user_org_ids"),
+    ]);
+
+    let orgs: Organization[] = [];
+
+    if (isSuperAdmin) {
+      const { data } = await supabase.from("organizations").select("*").order("name");
+      orgs = (data || []) as Organization[];
+    } else if (userOrgIds?.length) {
+      const { data } = await supabase
+        .from("organizations")
+        .select("*")
+        .in("id", userOrgIds)
+        .order("name");
+      orgs = (data || []) as Organization[];
+    }
 
     orgs.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -65,6 +78,14 @@ export function OrgProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     loadOrgs();
+
+    const { data: subscription } = supabase.auth.onAuthStateChange(() => {
+      loadOrgs();
+    });
+
+    return () => {
+      subscription.subscription.unsubscribe();
+    };
   }, []);
 
   const handleSetOrganization = (org: Organization) => {

@@ -24,7 +24,7 @@ const mainNavItems = [
   { href: "/dashboard/donors", label: "Donors", icon: Users },
   { href: "/dashboard/moves", label: "Moves", icon: ArrowRightLeft },
   { href: "/dashboard/move-ideas", label: "Move Ideas", icon: Lightbulb },
-  { href: "/dashboard/solicitors", label: "Solicitors", icon: UserCheck },
+  { href: "/dashboard/solicitors", label: "Team", icon: UserCheck },
 ];
 
 const systemNavItems = [
@@ -38,22 +38,34 @@ export function Sidebar() {
   const { organization, organizations, setOrganization } = useOrganization();
   const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [canManageSettings, setCanManageSettings] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) {
-        if (!cancelled) setIsSuperAdmin(false);
+        if (!cancelled) {
+          setIsSuperAdmin(false);
+          setCanManageSettings(false);
+        }
         return;
       }
-      const { data } = await supabase.rpc("is_super_admin");
-      if (!cancelled) setIsSuperAdmin(Boolean(data));
+
+      const [{ data: superAdminData }, { data: orgAdminData }] = await Promise.all([
+        supabase.rpc("is_super_admin"),
+        organization ? supabase.rpc("is_org_admin", { org_id: organization.id }) : Promise.resolve({ data: false } as const),
+      ]);
+
+      if (!cancelled) {
+        setIsSuperAdmin(Boolean(superAdminData));
+        setCanManageSettings(Boolean(superAdminData || orgAdminData));
+      }
     })();
     return () => {
       cancelled = true;
     };
-  }, [supabase]);
+  }, [organization, supabase]);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -149,7 +161,7 @@ export function Sidebar() {
           <div className="px-3 pt-5 pb-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-stone-500">
             System
           </div>
-          {[...systemNavItems, ...(isSuperAdmin ? [{ href: "/dashboard/super-admin", label: "Super Admin", icon: UserCog }] : [])].map((item) => {
+          {[...(canManageSettings ? systemNavItems : []), ...(isSuperAdmin ? [{ href: "/dashboard/super-admin", label: "Super Admin", icon: UserCog }] : [])].map((item) => {
             const isActive = pathname.startsWith(item.href);
 
             return (

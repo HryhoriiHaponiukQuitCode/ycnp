@@ -30,7 +30,7 @@ export default function SuperAdminPage() {
   const [createError, setCreateError] = useState("");
 
   const [invites, setInvites] = useState<InviteDraft[]>(() => [
-    { id: crypto.randomUUID(), email: "", role: "viewer" },
+    { id: crypto.randomUUID(), email: "", role: "organization_solicitor" },
   ]);
 
   const [createOrgOpen, setCreateOrgOpen] = useState(false);
@@ -126,7 +126,7 @@ export default function SuperAdminPage() {
     if (createOrgError) {
       setCreateError(createOrgError.message);
       setCreating(false);
-      return;
+      return false;
     }
 
     const newOrgId = orgJson?.id as string | undefined;
@@ -170,7 +170,7 @@ export default function SuperAdminPage() {
     setOrgs(allOrgs || []);
 
     setOrgName("");
-    setInvites([{ id: crypto.randomUUID(), email: "", role: "viewer" }]);
+    setInvites([{ id: crypto.randomUUID(), email: "", role: "organization_solicitor" }]);
     setCreating(false);
 
     if (inviteErrors.length > 0) {
@@ -180,6 +180,8 @@ export default function SuperAdminPage() {
     } else {
       alert("Organization created.");
     }
+
+    return true;
   }
 
   function closeCreateOrgModal() {
@@ -282,7 +284,7 @@ export default function SuperAdminPage() {
                     </h3>
                     <button
                       type="button"
-                      onClick={() => setInvites((prev) => [...prev, { id: crypto.randomUUID(), email: "", role: "viewer" }])}
+                      onClick={() => setInvites((prev) => [...prev, { id: crypto.randomUUID(), email: "", role: "organization_solicitor" }])}
                       className="text-sm text-orange-700 hover:underline"
                     >
                       + Add
@@ -307,9 +309,8 @@ export default function SuperAdminPage() {
                           }
                           className="w-28 px-3 py-2 border border-stone-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                         >
-                          <option value="viewer">Viewer</option>
-                          <option value="solicitor">Solicitor</option>
-                          <option value="admin">Admin</option>
+                          <option value="organization_solicitor">Solicitor</option>
+                          <option value="organization_admin">Admin</option>
                         </select>
                         {invites.length > 1 && (
                           <button
@@ -338,10 +339,8 @@ export default function SuperAdminPage() {
                   <button
                     type="button"
                     onClick={async () => {
-                      await handleCreateOrg();
-                      // If creation succeeded, `creating` will end and fields reset; close then.
-                      // We close unconditionally after the action completes to match desired UX.
-                      setCreateOrgOpen(false);
+                      const created = await handleCreateOrg();
+                      if (created) setCreateOrgOpen(false);
                     }}
                     disabled={creating || !canSubmit}
                     className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-5 py-2 rounded-lg text-sm font-medium disabled:opacity-50"

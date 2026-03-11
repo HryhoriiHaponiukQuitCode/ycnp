@@ -1,16 +1,12 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useOrganization } from "@/lib/context/org-context";
 import { cn } from "@/lib/utils";
 import { useResizableColumns, type ColumnDef } from "@/hooks/use-resizable-columns";
-import {
-  Search,
-  Plus,
-  Loader2,
-  X,
-} from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 
 const SOL_COLUMNS: ColumnDef[] = [
   { key: "name", initialWidth: 180, minWidth: 100 },
@@ -39,7 +35,6 @@ export default function SolicitorsPage() {
   const [solicitors, setSolicitors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [showAddModal, setShowAddModal] = useState(false);
   const supabase = createClient();
 
   const loadSolicitors = useCallback(async () => {
@@ -87,18 +82,17 @@ export default function SolicitorsPage() {
     <div className="w-full h-[calc(100vh-5rem)] flex flex-col gap-4">
       <div className="flex items-center justify-between pt-4">
         <div>
-          <h1 className="text-2xl font-bold text-stone-800">Solicitors</h1>
+          <h1 className="text-2xl font-bold text-stone-800">Team</h1>
           <p className="text-stone-500 text-sm">
-            {solicitors.length} solicitor{solicitors.length !== 1 ? "s" : ""} total
+            {solicitors.length} assignable team member{solicitors.length !== 1 ? "s" : ""} total
           </p>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
+        <Link
+          href="/dashboard/settings"
           className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
-          <Plus className="w-4 h-4" />
-          Add Solicitor
-        </button>
+          Manage Team
+        </Link>
       </div>
 
       {/* Search */}
@@ -108,7 +102,7 @@ export default function SolicitorsPage() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search solicitors by name, email, or title..."
+          placeholder="Search team members by name, email, or title..."
           className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
         />
       </div>
@@ -141,7 +135,7 @@ export default function SolicitorsPage() {
               ) : solicitors.length === 0 ? (
                 <tr>
                   <td colSpan={13} className="dm-table-empty">
-                    {search ? "No solicitors match your search" : "No solicitors yet. Add your team members!"}
+                    {search ? "No team members match your search" : "No assignable team members yet. Invite admins or solicitors first."}
                   </td>
                 </tr>
               ) : (
@@ -191,123 +185,6 @@ export default function SolicitorsPage() {
         </div>
       </div>
 
-      {showAddModal && (
-        <AddSolicitorModal
-          organizationId={organization?.id || ""}
-          onClose={() => setShowAddModal(false)}
-          onCreated={() => {
-            setShowAddModal(false);
-            loadSolicitors();
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
-function AddSolicitorModal({
-  organizationId,
-  onClose,
-  onCreated,
-}: {
-  organizationId: string;
-  onClose: () => void;
-  onCreated: () => void;
-}) {
-  const [saving, setSaving] = useState(false);
-  const [data, setData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    title: "", // This needs to go into solicitor_fiscal_years potentially, or we need to simplify
-  });
-  const supabase = createClient();
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
-    
-    // 1. Create solicitor in 'solicitors' table
-    const { data: solData, error } = await supabase
-      .from("solicitors")
-      .insert({
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        organization_id: organizationId,
-        is_active: true
-      })
-      .select()
-      .single();
-
-    if (error) {
-       console.error("Error creating solicitor:", error);
-       alert("Error creating solicitor");
-       setSaving(false);
-       return;
-    }
-
-    // 2. Ideally we should also get the current fiscal year and create a 'solicitor_fiscal_years' record with the title
-    // For now, let's keep it simple as the view might need adjustments or we do it later
-    // Let's rely on basic creation first.
-    
-    onCreated();
-    setSaving(false);
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100">
-          <h2 className="text-lg font-semibold text-stone-800">New Solicitor</h2>
-          <button onClick={onClose} className="text-stone-400 hover:text-stone-600">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Name *</label>
-            <input
-              type="text"
-              required
-              value={data.name}
-              onChange={(e) => setData({ ...data, name: e.target.value })}
-              className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Email</label>
-            <input
-              type="email"
-              value={data.email}
-              onChange={(e) => setData({ ...data, email: e.target.value })}
-              className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Phone</label>
-            <input
-              type="tel"
-              value={data.phone}
-              onChange={(e) => setData({ ...data, phone: e.target.value })}
-              className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
-          <div className="pt-2 flex justify-end gap-3 border-t border-stone-100 mt-4">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-stone-600 hover:bg-stone-100 rounded-lg">
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-4 py-2 text-sm font-medium bg-orange-600 hover:bg-orange-700 text-white rounded-lg flex items-center gap-2"
-            >
-              {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-              Save Solicitor
-            </button>
-          </div>
-        </form>
-      </div>
     </div>
   );
 }

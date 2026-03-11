@@ -8,6 +8,8 @@ type InvitePayload = {
   role?: string;
 };
 
+const ORG_INVITE_ROLES = new Set(["organization_admin", "organization_solicitor"]);
+
 function getBaseUrl(request: Request) {
   const url = new URL(request.url);
   const forwardedHost = request.headers.get("x-forwarded-host");
@@ -21,10 +23,14 @@ export async function POST(request: Request) {
     const body = (await request.json()) as InvitePayload;
     const organizationId = body.organizationId?.trim();
     const email = body.email?.trim().toLowerCase();
-    const role = body.role?.trim() || "viewer";
+    const role = body.role?.trim() || "organization_solicitor";
 
     if (!organizationId || !email) {
       return NextResponse.json({ error: "organizationId and email are required." }, { status: 400 });
+    }
+
+    if (!ORG_INVITE_ROLES.has(role)) {
+      return NextResponse.json({ error: "Invalid invite role." }, { status: 400 });
     }
 
     const supabase = await createClient();
@@ -37,26 +43,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    const [{ data: membership, error: membershipError }, { data: isSuperAdmin, error: superAdminError }] =
+    const [{ data: isOrgAdmin, error: orgAdminError }, { data: isSuperAdmin, error: superAdminError }] =
       await Promise.all([
-        supabase
-          .from("org_members")
-          .select("id")
-          .eq("organization_id", organizationId)
-          .eq("user_id", user.id)
-          .maybeSingle(),
+        supabase.rpc("is_org_admin", { org_id: organizationId }),
         supabase.rpc("is_super_admin"),
       ]);
 
-    if (membershipError) {
-      return NextResponse.json({ error: membershipError.message }, { status: 400 });
+    if (orgAdminError) {
+      return NextResponse.json({ error: orgAdminError.message }, { status: 400 });
     }
 
     if (superAdminError) {
       return NextResponse.json({ error: superAdminError.message }, { status: 400 });
     }
 
-    if (!membership && !isSuperAdmin) {
+    if (!isOrgAdmin && !isSuperAdmin) {
       return NextResponse.json({ error: "You do not have access to invite users to this organization." }, { status: 403 });
     }
 

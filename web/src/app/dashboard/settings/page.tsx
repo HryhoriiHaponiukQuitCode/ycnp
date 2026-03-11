@@ -6,6 +6,10 @@ import { useOrganization } from "@/lib/context/org-context";
 import { Loader2, Plus, Save, Trash2, UserCog, Calendar, X } from "lucide-react";
 import { formatDate, generateSlug } from "@/lib/utils";
 
+function formatRoleLabel(role: string) {
+  return role.replaceAll("_", " ");
+}
+
 export default function SettingsPage() {
   const { organization, setOrganization, loading: orgLoading } = useOrganization();
   const [loading, setLoading] = useState(true);
@@ -19,11 +23,12 @@ export default function SettingsPage() {
   const [createOrgName, setCreateOrgName] = useState("");
   const [createError, setCreateError] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState("viewer");
+  const [inviteRole, setInviteRole] = useState("organization_solicitor");
   const [inviting, setInviting] = useState(false);
   const [inviteError, setInviteError] = useState("");
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState<boolean | null>(null);
+  const [isOrgAdmin, setIsOrgAdmin] = useState<boolean | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const supabase = createClient();
@@ -46,16 +51,23 @@ export default function SettingsPage() {
 
       if (!loggedIn) {
         setIsSuperAdmin(false);
+        setIsOrgAdmin(false);
         return;
       }
 
-      const { data, error } = await supabase.rpc("is_super_admin");
+      const [{ data: superAdminData, error: superAdminError }, { data: orgAdminData, error: orgAdminError }] = await Promise.all([
+        supabase.rpc("is_super_admin"),
+        organization ? supabase.rpc("is_org_admin", { org_id: organization.id }) : Promise.resolve({ data: false, error: null } as const),
+      ]);
+
       if (cancelled) return;
-      if (error) {
+      if (superAdminError || orgAdminError) {
         setIsSuperAdmin(false);
+        setIsOrgAdmin(false);
         return;
       }
-      setIsSuperAdmin(Boolean(data));
+      setIsSuperAdmin(Boolean(superAdminData));
+      setIsOrgAdmin(Boolean(orgAdminData));
     }
 
     refreshAuthAndPerms();
@@ -108,15 +120,17 @@ export default function SettingsPage() {
     };
   }, [organization, supabase]);
 
+  const canManageSettings = Boolean(isSuperAdmin || isOrgAdmin);
+
   async function handleInviteMember(e: React.FormEvent) {
     e.preventDefault();
-    if (!organization) return;
+    if (!organization) return false;
 
     setInviteError("");
     const email = inviteEmail.trim().toLowerCase();
     if (!email) {
       setInviteError("Enter an email");
-      return;
+      return false;
     }
 
     setInviting(true);
@@ -137,7 +151,7 @@ export default function SettingsPage() {
     if (!response.ok) {
       setInviteError(result.error || "Failed to send invite");
       setInviting(false);
-      return;
+      return false;
     }
 
     const { data: inviteData } = await supabase
@@ -152,6 +166,7 @@ export default function SettingsPage() {
     setInviting(false);
 
     alert(`Invite sent to ${email}. They will receive a link to set their password.`);
+    return true;
   }
 
   function closeInviteModal() {
@@ -290,6 +305,29 @@ export default function SettingsPage() {
             </button>
           </form>
         )}
+      </div>
+    );
+  }
+
+  if (!authReady || isSuperAdmin === null || isOrgAdmin === null) {
+    return (
+      <div className="w-full py-20 text-center">
+        <Loader2 className="w-8 h-8 mx-auto animate-spin text-orange-600 mb-4" />
+        <p className="text-lg text-stone-600">Checking access…</p>
+      </div>
+    );
+  }
+
+  if (!canManageSettings) {
+    return (
+      <div className="max-w-xl mx-auto py-16 space-y-3">
+        <h1 className="font-serif text-3xl font-medium tracking-tight text-stone-900">Settings</h1>
+        <div className="bg-white border border-stone-200 rounded-xl p-6 shadow-sm space-y-2">
+          <p className="text-sm font-medium text-stone-900">Access denied.</p>
+          <p className="text-sm text-stone-600">
+            Only organization admins and super admins can manage organization settings and invites.
+          </p>
+        </div>
       </div>
     );
   }
@@ -460,10 +498,8 @@ export default function SettingsPage() {
                   <div className="p-6">
                     <form
                       onSubmit={async (e) => {
-                        await handleInviteMember(e);
-                        // Close only if we didn't set an error (best-effort).
-                        // If an error occurs, keep modal open so user can fix.
-                        if (!inviteError) setInviteModalOpen(false);
+                        const sent = await handleInviteMember(e);
+                        if (sent) setInviteModalOpen(false);
                       }}
                       className="space-y-4"
                     >
@@ -485,9 +521,8 @@ export default function SettingsPage() {
                           onChange={(e) => setInviteRole(e.target.value)}
                           className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                         >
-                          <option value="viewer">Viewer</option>
-                          <option value="solicitor">Solicitor</option>
-                          <option value="admin">Admin</option>
+                          <option value="organization_solicitor">Solicitor</option>
+                          <option value="organization_admin">Admin</option>
                         </select>
                       </div>
                       {inviteError && <p className="text-sm text-red-600">{inviteError}</p>}
@@ -532,8 +567,11 @@ export default function SettingsPage() {
                 <tbody>
                   {members.map(member => (
                     <tr key={member.id} className="dm-table-row">
-                      <td className="dm-table-cell text-stone-500">{member.email || "—"}</td>
-                      <td className="dm-table-cell capitalize text-stone-800">{member.role}</td>
+                      <td className="dm-table-cell text-stone-500">
+                        <div className="font-medium text-stone-800">{member.full_name || "—"}</div>
+                        <div>{member.email || "—"}</div>
+                      </td>
+                      <td className="dm-table-cell capitalize text-stone-800">{formatRoleLabel(member.role)}</td>
                       <td className="dm-table-cell dm-table-cell-last text-right text-stone-500">{formatDate(member.created_at)}</td>
                     </tr>
                   ))}
@@ -566,7 +604,7 @@ export default function SettingsPage() {
                   {invites.map((i) => (
                     <tr key={i.id} className="dm-table-row">
                       <td className="dm-table-cell font-medium text-stone-800">{i.email}</td>
-                      <td className="dm-table-cell capitalize text-stone-500">{i.role}</td>
+                      <td className="dm-table-cell capitalize text-stone-500">{formatRoleLabel(i.role)}</td>
                       <td className="dm-table-cell text-stone-500">{i.created_at ? formatDate(i.created_at) : ""}</td>
                       <td className="dm-table-cell dm-table-cell-last text-right">
                         <button onClick={() => handleRevokeInvite(i.id)} className="text-sm text-red-600 hover:underline">Revoke</button>

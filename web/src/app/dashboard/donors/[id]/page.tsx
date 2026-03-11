@@ -22,7 +22,6 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 // Define tabs
 type Tab = "overview" | "scores" | "moves" | "donations" | "notes";
@@ -30,7 +29,6 @@ type Tab = "overview" | "scores" | "moves" | "donations" | "notes";
 export default function DonorDetailPage({ params }: { params: Promise<{ id: string }> }) {
   // Unwrap params using React.use()
   const { id } = use(params);
-  const router = useRouter();
   const { organization } = useOrganization();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [donor, setDonor] = useState<any>(null);
@@ -81,8 +79,8 @@ export default function DonorDetailPage({ params }: { params: Promise<{ id: stri
 
       // Fetch moves
       const { data: movesData } = await supabase
-        .from("moves")
-        .select("*, assigned_to_name:solicitors(name)") // Ensure solicitors relation is correct based on schema
+        .from("v_moves_dashboard")
+        .select("*")
         .eq("donor_id", id)
         .order("due_date", { ascending: false });
 
@@ -405,17 +403,17 @@ export default function DonorDetailPage({ params }: { params: Promise<{ id: stri
                     <tbody>
                       {moves.map(move => (
                         <tr key={move.id} className="dm-table-row">
-                          <td className="dm-table-cell font-medium text-stone-800">{move.name}</td>
+                          <td className="dm-table-cell font-medium text-stone-800">{move.move_name}</td>
                           <td className="dm-table-cell">
                             <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${move.is_completed ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                               {move.is_completed ? 'Completed' : 'Pending'}
                             </span>
                           </td>
                           <td className="dm-table-cell text-stone-500">
-                            {move.is_completed ? formatDate(move.completed_at || move.updated_at) : formatDate(move.due_date)}
+                            {move.is_completed ? formatDate(move.completed_at) : formatDate(move.due_date)}
                           </td>
                           <td className="dm-table-cell dm-table-cell-last text-stone-500">
-                            {move.assigned_to_name?.name || '—'}
+                            {move.assigned_to_name || '—'}
                           </td>
                         </tr>
                       ))}
