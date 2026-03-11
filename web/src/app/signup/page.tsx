@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { YCLogo } from "@/components/yc-logo";
@@ -14,6 +14,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
   async function handleSignup(e: React.FormEvent) {
@@ -43,7 +44,8 @@ export default function SignupPage() {
     }
 
     // Redirect to dashboard; organization can be created after login in settings
-    router.push("/dashboard");
+    const next = searchParams.get("next") || "/dashboard";
+    router.push(next);
     router.refresh();
   }
 

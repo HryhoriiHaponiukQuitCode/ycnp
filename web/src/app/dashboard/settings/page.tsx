@@ -121,31 +121,21 @@ export default function SettingsPage() {
 
     setInviting(true);
 
-    const { data: invite, error: inviteRpcError } = await supabase.rpc("create_org_invite", {
-      p_organization_id: organization.id,
-      p_email: email,
-      p_role: inviteRole,
-    });
-
-    if (inviteRpcError || !invite) {
-      setInviteError(inviteRpcError?.message || "Failed to create invite");
-      setInviting(false);
-      return;
-    }
-
-    const origin = window.location.origin;
-    const nextPath = `/invite/accept?token=${encodeURIComponent(invite.token)}`;
-    const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
-
-    const { error: otpError } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: redirectTo,
+    const response = await fetch("/api/org-invites", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        organizationId: organization.id,
+        email,
+        role: inviteRole,
+      }),
     });
 
-    if (otpError) {
-      setInviteError(otpError.message);
+    const result = await response.json();
+    if (!response.ok) {
+      setInviteError(result.error || "Failed to send invite");
       setInviting(false);
       return;
     }
@@ -161,7 +151,7 @@ export default function SettingsPage() {
     setInviteEmail("");
     setInviting(false);
 
-    alert(`Invite sent to ${email}. They will receive a login link by email.`);
+    alert(`Invite sent to ${email}. They will receive a link to set their password.`);
   }
 
   function closeInviteModal() {

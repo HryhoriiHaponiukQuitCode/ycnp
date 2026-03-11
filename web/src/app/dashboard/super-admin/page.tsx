@@ -140,30 +140,21 @@ export default function SuperAdminPage() {
 
     if (newOrgId && inviteRows.length > 0) {
       for (const inv of inviteRows) {
-        const { data: invite, error: inviteRpcError } = await supabase.rpc("create_org_invite", {
-          p_organization_id: newOrgId,
-          p_email: inv.email,
-          p_role: inv.role,
-        });
-
-        if (inviteRpcError || !invite) {
-          inviteErrors.push(`${inv.email}: ${inviteRpcError?.message || "failed to create invite"}`);
-          continue;
-        }
-
-        const origin = window.location.origin;
-        const nextPath = `/invite/accept?token=${encodeURIComponent(invite.token)}`;
-        const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
-
-        const { error: otpError } = await supabase.auth.signInWithOtp({
-          email: inv.email,
-          options: {
-            emailRedirectTo: redirectTo,
+        const response = await fetch("/api/org-invites", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            organizationId: newOrgId,
+            email: inv.email,
+            role: inv.role,
+          }),
         });
 
-        if (otpError) {
-          inviteErrors.push(`${inv.email}: ${otpError.message}`);
+        const result = await response.json();
+        if (!response.ok) {
+          inviteErrors.push(`${inv.email}: ${result.error || "failed to send invite"}`);
         }
       }
     }

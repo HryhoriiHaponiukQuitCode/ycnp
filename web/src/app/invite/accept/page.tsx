@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { useOrganization } from "@/lib/context/org-context";
 import { Loader2 } from "lucide-react";
 
 export default function AcceptInvitePage() {
@@ -29,16 +28,13 @@ function AcceptInviteFallback() {
 function AcceptInviteInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { refreshOrganizations } = useOrganization();
+  const token = searchParams.get("token");
 
-  const [status, setStatus] = useState<"working" | "error" | "done">("working");
-  const [message, setMessage] = useState<string>("Accepting invite…");
+  const [status, setStatus] = useState<"working" | "error" | "done">(token ? "working" : "error");
+  const [message, setMessage] = useState<string>(token ? "Accepting invite…" : "Missing invite token.");
 
   useEffect(() => {
-    const token = searchParams.get("token");
     if (!token) {
-      setStatus("error");
-      setMessage("Missing invite token.");
       return;
     }
 
@@ -52,7 +48,7 @@ function AcceptInviteInner() {
         return;
       }
 
-      const { data, error } = await supabase.rpc("accept_org_invite", { p_token: token });
+      const { error } = await supabase.rpc("accept_org_invite", { p_token: token });
       if (error) {
         setStatus("error");
         setMessage(error.message);
@@ -60,14 +56,13 @@ function AcceptInviteInner() {
       }
 
       // Refresh org list and redirect into the app
-      await refreshOrganizations();
       setStatus("done");
       setMessage("Invite accepted. Redirecting…");
 
       // Optionally we could also persist current_org_id here, but org-context will pick it up.
       router.replace("/dashboard");
     })();
-  }, [router, searchParams, refreshOrganizations]);
+  }, [router, token]);
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
