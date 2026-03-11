@@ -9,14 +9,13 @@ const OUTPUT_FILE = path.join(EXPORT_DIR, "data-import-fixed.sql");
 
 const importPlan = [
   { table: "organizations", file: "organizations.json" },
-  { table: "super_admins", file: "super_admins.json" },
-  { table: "org_members", file: "org_members.json" },
+  { table: "user_roles", file: "user_roles.json" },
   { table: "fiscal_years", file: "fiscal_years.json" },
-  { table: "solicitors", file: "solicitors.json" },
-  { table: "solicitor_fiscal_years", file: "solicitor_fiscal_years.json" },
+  { table: "user_role_fiscal_years", file: "user_role_fiscal_years.json" },
   { table: "donors", file: "donors.json" },
   { table: "donor_scores", file: "donor_scores.json" },
   { table: "donations", file: "donations.json" },
+  { table: "donor_assignments", file: "donor_assignments.json" },
   { table: "move_ideas", file: "move_ideas.json" },
   { table: "moves", file: "moves.json" },
   { table: "donor_tags", file: "donor_tags.json" },
@@ -24,7 +23,6 @@ const importPlan = [
   { table: "donor_research", file: "donor_research.json" },
   { table: "meeting_notes", file: "meeting_notes.json" },
   { table: "org_invites", file: "org_invites.json" },
-  { table: "donor_solicitor_assignments", file: "donor_solicitor_assignments.json" },
 ];
 
 function readJson(filename) {

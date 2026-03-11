@@ -21,14 +21,13 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 
 const importPlan = [
   { table: "organizations", file: "organizations.json", conflict: "id" },
-  { table: "super_admins", file: "super_admins.json", conflict: "email" },
-  { table: "org_members", file: "org_members.json", conflict: "id" },
+  { table: "user_roles", file: "user_roles.json", conflict: "id" },
   { table: "fiscal_years", file: "fiscal_years.json", conflict: "id" },
-  { table: "solicitors", file: "solicitors.json", conflict: "id" },
-  { table: "solicitor_fiscal_years", file: "solicitor_fiscal_years.json", conflict: "id" },
+  { table: "user_role_fiscal_years", file: "user_role_fiscal_years.json", conflict: "id" },
   { table: "donors", file: "donors.json", conflict: "id" },
   { table: "donor_scores", file: "donor_scores.json", conflict: "id" },
   { table: "donations", file: "donations.json", conflict: "id" },
+  { table: "donor_assignments", file: "donor_assignments.json", conflict: "id" },
   { table: "move_ideas", file: "move_ideas.json", conflict: "id" },
   { table: "moves", file: "moves.json", conflict: "id" },
   { table: "donor_tags", file: "donor_tags.json", conflict: "id" },
@@ -36,7 +35,6 @@ const importPlan = [
   { table: "donor_research", file: "donor_research.json", conflict: "id" },
   { table: "meeting_notes", file: "meeting_notes.json", conflict: "id" },
   { table: "org_invites", file: "org_invites.json", conflict: "id" },
-  { table: "donor_solicitor_assignments", file: "donor_solicitor_assignments.json", conflict: "id" },
 ];
 
 function readJson(filename) {

@@ -14,14 +14,13 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 
 const tables = [
   "organizations",
-  "org_members",
+  "user_roles",
   "fiscal_years",
-  "solicitors",
-  "solicitor_fiscal_years",
+  "user_role_fiscal_years",
   "donors",
   "donor_scores",
   "donations",
-  "donor_solicitor_assignments",
+  "donor_assignments",
   "move_ideas",
   "moves",
   "donor_tags",
@@ -29,7 +28,6 @@ const tables = [
   "donor_research",
   "meeting_notes",
   "org_invites",
-  "super_admins",
 ];
 
 async function main() {
