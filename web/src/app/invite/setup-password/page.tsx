@@ -1,11 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function InviteSetupPasswordPage() {
+  return (
+    <Suspense fallback={<InviteSetupPasswordFallback />}>
+      <InviteSetupPasswordInner />
+    </Suspense>
+  );
+}
+
+function InviteSetupPasswordFallback() {
+  return (
+    <div className="min-h-screen bg-stone-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white border border-stone-200 rounded-2xl shadow-sm p-8 space-y-6 text-center">
+        <Loader2 className="w-6 h-6 mx-auto animate-spin text-orange-600" />
+        <h1 className="text-2xl font-semibold text-stone-900">Finish your invite</h1>
+        <p className="text-sm text-stone-600">Preparing your invite…</p>
+      </div>
+    </div>
+  );
+}
+
+function InviteSetupPasswordInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
