@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useOrganization } from "@/lib/context/org-context";
 import { Loader2, Plus, Save, Trash2, UserCog, Calendar, X } from "lucide-react";
-import { formatDate, generateSlug } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 function formatRoleLabel(role: string) {
   return role.replaceAll("_", " ");
@@ -19,9 +20,6 @@ export default function SettingsPage() {
   const [invites, setInvites] = useState<any[]>([]);
   const [orgForm, setOrgForm] = useState({ name: "", website: "" });
   const [saving, setSaving] = useState(false);
-  const [creatingOrg, setCreatingOrg] = useState(false);
-  const [createOrgName, setCreateOrgName] = useState("");
-  const [createError, setCreateError] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("organization_solicitor");
   const [inviting, setInviting] = useState(false);
@@ -216,40 +214,6 @@ export default function SettingsPage() {
     setSaving(false);
   }
 
-  async function handleCreateOrganization(e: React.FormEvent) {
-    e.preventDefault();
-    setCreateError("");
-    if (!createOrgName.trim()) {
-      setCreateError("Enter organization name");
-      return;
-    }
-    setCreatingOrg(true);
-    const slug = generateSlug(createOrgName.trim());
-    const { error: rpcError } = await supabase.rpc("create_organization", {
-      name: createOrgName.trim(),
-      slug,
-    });
-
-    if (rpcError) {
-      setCreateError(rpcError.message);
-      setCreatingOrg(false);
-      return;
-    }
-
-    // Load the newly created organization and set as current
-    const { data: orgData } = await supabase
-      .from("organizations")
-      .select("*")
-      .eq("slug", slug)
-      .single();
-
-    if (orgData) {
-      setOrganization(orgData as any);
-      setCreateOrgName("");
-    }
-    setCreatingOrg(false);
-  }
-
   if (orgLoading) {
     return (
       <div className="w-full py-20 text-center">
@@ -263,48 +227,28 @@ export default function SettingsPage() {
     return (
       <div className="max-w-xl mx-auto py-16 space-y-6">
         <div className="text-center space-y-2">
-          <p className="text-lg font-semibold text-stone-900">Let’s set up your organization</p>
-          <p className="text-stone-600">Create an organization to start using the workspace.</p>
+          <p className="text-lg font-semibold text-stone-900">No organization selected</p>
+          <p className="text-stone-600">
+            Super admins can create organizations only from the Super Admin page. Other users need to be added to an existing organization.
+          </p>
         </div>
-        {!authReady || isSuperAdmin === null ? (
-          <div className="bg-white border border-stone-200 rounded-xl p-6 shadow-sm flex items-center gap-3 text-stone-600">
-            <Loader2 className="w-4 h-4 animate-spin text-orange-600" />
-            <p className="text-sm">Checking permissions…</p>
-          </div>
-        ) : !isSuperAdmin ? (
-          <div className="bg-white border border-stone-200 rounded-xl p-6 shadow-sm space-y-2">
-            <p className="text-sm font-medium text-stone-900">
-              {isLoggedIn ? "You don’t have permission to create organizations." : "You’re not signed in."}
+        <div className="bg-white border border-stone-200 rounded-xl p-6 shadow-sm space-y-3 text-center">
+          {authReady && isSuperAdmin ? (
+            <>
+              <p className="text-sm text-stone-700">Use the Super Admin page to create an organization and then switch into it.</p>
+              <Link
+                href="/dashboard/super-admin"
+                className="inline-flex items-center justify-center rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700"
+              >
+                Go to Super Admin
+              </Link>
+            </>
+          ) : (
+            <p className="text-sm text-stone-700">
+              Ask your super admin to create an organization or add you to an existing one.
             </p>
-            <p className="text-sm text-stone-600">
-              {isLoggedIn
-                ? "Ask your super admin to create an organization or invite you to one."
-                : "Please sign in again, then reload this page."}
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={handleCreateOrganization} className="bg-white border border-stone-200 rounded-xl p-6 shadow-sm space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-stone-900 mb-1">Organization name</label>
-              <input
-                type="text"
-                value={createOrgName}
-                onChange={(e) => setCreateOrgName(e.target.value)}
-                className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="E.g., Helping Hands Foundation"
-              />
-            </div>
-            {createError && <p className="text-sm text-red-600">{createError}</p>}
-            <button
-              type="submit"
-              disabled={creatingOrg}
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-2.5 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {creatingOrg && <Loader2 className="w-4 h-4 animate-spin" />}
-              Create Organization
-            </button>
-          </form>
-        )}
+          )}
+        </div>
       </div>
     );
   }
