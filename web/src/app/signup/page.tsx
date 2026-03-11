@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -8,6 +8,36 @@ import { Loader2 } from "lucide-react";
 import { YCLogo } from "@/components/yc-logo";
 
 export default function SignupPage() {
+  return (
+    <Suspense fallback={<AuthPageFallback title="Sign Up" subtitle="Loading signup page…" />}>
+      <SignupPageInner />
+    </Suspense>
+  );
+}
+
+function AuthPageFallback({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-stone-100 px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 mb-2">
+            <YCLogo className="w-8 h-8" alt="YC" />
+            <h1 className="text-3xl font-bold text-stone-900">DonorMind</h1>
+          </div>
+          <p className="text-stone-600 text-sm">Create your account</p>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-8 space-y-4 text-center">
+          <Loader2 className="w-5 h-5 mx-auto animate-spin text-orange-600" />
+          <h2 className="text-xl font-semibold text-stone-900">{title}</h2>
+          <p className="text-sm text-stone-600">{subtitle}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SignupPageInner() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
