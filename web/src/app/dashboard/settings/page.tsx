@@ -29,7 +29,7 @@ export default function SettingsPage() {
   const [isOrgAdmin, setIsOrgAdmin] = useState<boolean | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const supabase = createClient();
+  const supabase = createClient() as any;
   const tabs = [
     { id: "general", label: "General" },
     { id: "fiscal_years", label: "Fiscal Years" },

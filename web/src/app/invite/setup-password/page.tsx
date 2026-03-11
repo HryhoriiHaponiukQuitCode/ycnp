@@ -28,7 +28,7 @@ function InviteSetupPasswordFallback() {
 function InviteSetupPasswordInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClient();
+  const supabase = createClient() as any;
 
   const token = searchParams.get("token");
   const [password, setPassword] = useState("");
@@ -70,7 +70,7 @@ function InviteSetupPasswordInner() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       if (!active || !session) return;
       setStatus("ready");
       setMessage("Set your password to finish joining the organization.");

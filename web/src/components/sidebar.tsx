@@ -34,7 +34,7 @@ const systemNavItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = createClient() as any;
   const { organization, organizations, setOrganization } = useOrganization();
   const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);

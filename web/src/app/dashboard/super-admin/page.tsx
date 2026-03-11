@@ -15,7 +15,7 @@ type InviteDraft = {
 
 export default function SuperAdminPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = createClient() as any;
   const { refreshOrganizations } = useOrganization();
 
   const [checking, setChecking] = useState(true);

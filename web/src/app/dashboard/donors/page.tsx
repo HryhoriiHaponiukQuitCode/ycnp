@@ -80,7 +80,7 @@ export default function DonorsPage() {
   const [capacityOptions, setCapacityOptions] = useState<string[]>([]);
   const [openFilter, setOpenFilter] = useState<null | "generosity" | "city" | "capacity">(null);
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const supabase = createClient();
+  const supabase = createClient() as any;
 
   const loadDonors = useCallback(async () => {
     if (!organization) return;
@@ -98,7 +98,7 @@ export default function DonorsPage() {
     }
 
     if (selectedGenerosity.length > 0) {
-      query = query.in("generosity_score", selectedGenerosity);
+      query = query.in("generosity_score", selectedGenerosity as any);
     }
 
     if (selectedCities.length > 0) {
@@ -129,7 +129,7 @@ export default function DonorsPage() {
         .eq("organization_id", organization.id);
 
       const nextStats = (data || []).reduce(
-        (acc, donor) => {
+        (acc: { onFireCount: number; totalCapacity: number; activeThisYear: number }, donor: any) => {
           if (donor.generosity_score === "On Fire!") acc.onFireCount += 1;
           if (typeof donor.ask_goal === "number") acc.totalCapacity += donor.ask_goal;
           if (typeof donor.is_current_donor === "number" && donor.is_current_donor > 0) acc.activeThisYear += 1;
@@ -140,10 +140,10 @@ export default function DonorsPage() {
 
       setStats(nextStats);
       setCityOptions(
-        Array.from(new Set((data || []).map((donor) => donor.city).filter((value): value is string => Boolean(value)))).sort((a, b) => a.localeCompare(b))
+        (Array.from(new Set((data || []).map((donor: any) => donor.city).filter((value: any): value is string => Boolean(value)))) as string[]).sort((a: string, b: string) => a.localeCompare(b))
       );
       setCapacityOptions(
-        Array.from(new Set((data || []).map((donor) => donor.wealth_capacity).filter((value): value is string => Boolean(value))))
+        Array.from(new Set((data || []).map((donor: any) => donor.wealth_capacity).filter((value: any): value is string => Boolean(value))))
       );
     })();
   }, [organization, supabase]);

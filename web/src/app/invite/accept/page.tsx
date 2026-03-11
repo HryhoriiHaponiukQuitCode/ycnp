@@ -38,7 +38,7 @@ function AcceptInviteInner() {
       return;
     }
 
-    const supabase = createClient();
+    const supabase = createClient() as any;
 
     (async () => {
       const { data: sessionData } = await supabase.auth.getSession();
